@@ -35,7 +35,7 @@ BEGIN
 
         -- Create a new notification for the incident
         INSERT INTO user_notification (incident_id, title)
-        VALUES (NEW.incident_id, 'New assigned Incident');
+        VALUES (NEW.incident_id, 'New Assigned Incident');
 
         -- Get the generated notification ID
         SET new_notification_id = LAST_INSERT_ID();
