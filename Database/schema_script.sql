@@ -118,3 +118,12 @@ CREATE TABLE IF NOT EXISTS user_notification_status (
     FOREIGN KEY (user_notification_id) REFERENCES user_notification(user_notification_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- Indexes
+create index user_role_idx on user(role);
+create unique index user_email_idx on user(email);
+
+create index vehicle_status_idx on vehicle(`status`);  
+
+create spatial index station_location_idx on station(location);
+create index station_type_indx on station(`type`);
