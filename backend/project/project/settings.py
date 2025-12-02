@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+import datetime
 import os
 load_dotenv() 
 
@@ -130,3 +131,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# JWT settings
+JWT_SECRET = os.getenv('SECRET_KEY') 
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_LIFETIME = datetime.timedelta(minutes=1)
+JWT_REFRESH_TOKEN_LIFETIME = datetime.timedelta(days=7)
+JWT_ISSUER = "emergency_dispatcher"  
+JWT_AUTH_HEADER = "AUTHORIZATION"

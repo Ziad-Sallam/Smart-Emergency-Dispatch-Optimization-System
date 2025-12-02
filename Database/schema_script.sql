@@ -1,6 +1,6 @@
 -- Schema: Emergency_Dispatcher
-CREATE DATABASE IF NOT EXISTS Emergency_Dispatcher;
-USE Emergency_Dispatcher;
+CREATE DATABASE IF NOT EXISTS emergency_dispatcher;
+USE emergency_dispatcher;
 
 -- Table: user
 CREATE TABLE IF NOT EXISTS user (
