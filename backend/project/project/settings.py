@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # JWT settings
 JWT_SECRET = os.getenv('SECRET_KEY') 
 JWT_ALGORITHM = "HS256"
-JWT_ACCESS_TOKEN_LIFETIME = datetime.timedelta(minutes=1)
+JWT_ACCESS_TOKEN_LIFETIME = datetime.timedelta(minutes=15)
 JWT_REFRESH_TOKEN_LIFETIME = datetime.timedelta(days=7)
 JWT_ISSUER = "emergency_dispatcher"  
 JWT_AUTH_HEADER = "AUTHORIZATION"
