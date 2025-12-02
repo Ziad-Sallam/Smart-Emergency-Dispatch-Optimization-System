@@ -1,15 +1,15 @@
 DELIMITER $$
 
 CREATE PROCEDURE handle_new_incident(
-    IN location POINT, 
-    IN severity_level VARCHAR(10),
-    IN type VARCHAR(10),
+    IN inc_location POINT, 
+    IN inc_severity_level ENUM('LOW', 'MEDIUM', 'HIGH', 'CRITICAL'),
+    IN inc_type ENUM('FIRE', 'POLICE', 'MEDICAL'),
     OUT available_vehicle_id INT
 )
 BEGIN
     DECLARE new_incident_id INT;
 
-    INSERT INTO incident (location, severity_level, type) VALUES (location, severity_level, type);
+    INSERT INTO incident (location, severity_level, type) VALUES (inc_location, inc_severity_level, inc_type);
     SET new_incident_id = LAST_INSERT_ID();
 
     START TRANSACTION;
@@ -18,8 +18,8 @@ BEGIN
     SELECT v.vehicle_id INTO available_vehicle_id 
     FROM vehicle v
     JOIN station s ON s.station_id = v.station_id
-    WHERE status = 'AVAILABLE' AND s.type = type 
-    ORDER BY ST_Distance_Sphere(v.location, location) ASC
+    WHERE status = 'AVAILABLE' AND s.type = inc_type 
+    ORDER BY ST_Distance_Sphere(v.location, inc_location) ASC
     LIMIT 1 FOR UPDATE SKIP LOCKED;
     
 
@@ -27,7 +27,7 @@ BEGIN
         ROLLBACK;
         INSERT INTO admin_notification (title, body) 
         VALUES ('No available vehicles',
-        CONCAT('No available' , type, ' vehicles for incident ', new_incident_id,' with severity level ', severity_level));
+        CONCAT('No available ' , inc_type, ' vehicles for incident ', new_incident_id,' with severity level ', inc_severity_level));
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No available vehicle found';
     END IF;
