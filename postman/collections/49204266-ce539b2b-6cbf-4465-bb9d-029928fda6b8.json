@@ -400,6 +400,49 @@
 					"response": []
 				},
 				{
+					"name": "List Incidents Copy",
+					"id": "49204266-9eb021b8-6f5f-40dd-a208-e69317b39d13",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlbWVyZ2VuY3lfZGlzcGF0Y2hlciIsImlhdCI6MTc2NDc2Njk5NCwiZXhwIjoxNzY0Nzc1MDk0LCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6MywidXNlcl9yb2xlIjoiQURNSU4ifQ.mE-UVFYXZ1qa7zdKFgAfp-siGxIqFfjzIYaQrNp9-rc",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/admin/incidents/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"admin",
+								"incidents",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "List Vehicles",
 					"id": "49204266-4a843ea5-c813-4906-8051-c9ff5f8b0596",
 					"protocolProfileBehavior": {
