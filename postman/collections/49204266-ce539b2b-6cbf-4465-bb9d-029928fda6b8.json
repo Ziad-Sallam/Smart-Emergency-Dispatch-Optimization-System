@@ -481,7 +481,7 @@
 					"response": []
 				},
 				{
-					"name": "Dispatch Incident Copy",
+					"name": "Get Dispatch",
 					"id": "49204266-43fda9fb-7f6b-44e0-b1f0-31b8d36567e5",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
