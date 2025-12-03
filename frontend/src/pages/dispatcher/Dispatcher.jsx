@@ -32,15 +32,30 @@ export default function Dispatcher() {
   };
 
   const assignUnit = (incidentId, carId) => {
-    const selectedCar = cars.find(c => c.id === carId);
-    setIncidents(prev => prev.map(inc => {
-        if (inc.id === incidentId) return { ...inc, status: "Dispatched", assignedUnit: selectedCar.name };
-        return inc;
-    }));
-    setCars(prev => prev.map(car => {
-        if (car.id === carId) return { ...car, status: "Busy" };
-        return car;
-    }));
+    try {
+      axios.post("http://127.0.0.1:8000/admin/incidents/dispatch/",
+        {
+            incident_id: incidentId,
+            new_vehicle_id: carId
+      },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` } }
+      ).then(response => {
+        console.log("Dispatch response:", response.data);
+        }).catch(error => {
+            console.error("Error dispatching unit:", error);
+        });
+    } catch (error) {
+      console.error("Error in assignUnit:", error);
+    }
+    // const selectedCar = cars.find(c => c.id === carId);
+    // setIncidents(prev => prev.map(inc => {
+    //     if (inc.id === incidentId) return { ...inc, status: "Dispatched", assignedUnit: selectedCar.name };
+    //     return inc;
+    // }));
+    // setCars(prev => prev.map(car => {
+    //     if (car.id === carId) return { ...car, status: "Busy" };
+    //     return car;
+    // }));
   };
 
 

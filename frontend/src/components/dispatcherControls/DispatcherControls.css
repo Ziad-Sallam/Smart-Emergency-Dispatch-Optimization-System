@@ -146,6 +146,60 @@
     background: #2c2a63;
 }
 
+.add-button-incident button{
+    padding: 8px 12px;
+    border: none;
+    height: 35px;
+    text-align: center;
+    background: #d32f2f;
+    color: white;
+    width: 100%;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.add-button-incident button:hover{
+    background: rgb(169, 0, 0);
+    transition: 0.3s;
+}
+
+.add-button-car button{
+    padding: 8px 12px;
+    border: none;
+    height: 35px;
+    text-align: center;
+    background: #007bff;
+    color: white;
+    width: 100%;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.add-button-car button:hover{
+    background: #005ab9;
+    transition: 0.3s;
+}
+
+.add-button-station button{
+    padding: 8px 12px;
+    border: none;
+    height: 35px;
+    text-align: center;
+    background: #28a745;
+    color: white;
+    width: 100%;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.add-button-station button:hover{
+    background: #1e7c34;
+    transition: 0.3s;
+}
+
 /* SELECTOR UI */
 .unit-selector {
     display: flex;

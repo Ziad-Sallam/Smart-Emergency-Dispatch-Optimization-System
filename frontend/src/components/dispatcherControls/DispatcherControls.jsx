@@ -19,6 +19,21 @@ export default function DispatcherControls({
     return "#388e3c";
   };
 
+  const addIncident = () => {
+    // Placeholder for adding incident functionality
+    alert("Add Incident functionality to be implemented.");
+  }
+
+    const addCar = () => { 
+    // Placeholder for adding car functionality
+    alert("Add Car functionality to be implemented.");
+  }
+
+    const addStation = () => {
+    // Placeholder for adding station functionality
+    alert("Add Station functionality to be implemented.");
+  }
+
   return (
     <div className="dispatcher-controls">
       <header className="dc-header">
@@ -54,8 +69,27 @@ export default function DispatcherControls({
         </button>
       </div>
 
+      {activeTab === "incidents" && (
+            <div className="add-button-incident">
+                <button onClick={addIncident}>+ Add Incident</button>
+            </div>
+        )}
+
+        {activeTab === "cars" && (
+            <div className="add-button-car">
+                <button onClick={addCar}>+ Add Car</button>
+            </div>
+        )}
+
+        {activeTab === "stations" && (
+            <div className="add-button-station">
+                <button onClick={addStation}>+ Add Station</button>
+            </div>
+        )}
+
       <div className="dc-content">
         {/* 1. INCIDENTS VIEW */}
+        
         {activeTab === "incidents" && (
           <div className="list-container">
             {allIncidents.map((inc) => (
@@ -91,12 +125,12 @@ export default function DispatcherControls({
                   </span>
                   {inc.status === "REPORTED" ? (
                     <div className="assign-action">
-                      {selectedIncidentId === inc.id ? (
+                      {selectedIncidentId === inc.incident_id ? (
                         <div className="unit-selector">
                           <select
                             onChange={(e) => {
                               if (e.target.value) {
-                                onAssign(inc.id, e.target.value);
+                                onAssign(inc.incident_id, e.target.value);
                                 setSelectedIncidentId(null);
                               }
                             }}
@@ -123,7 +157,7 @@ export default function DispatcherControls({
                       ) : (
                         <button
                           className="btn-dispatch"
-                          onClick={() => setSelectedIncidentId(inc.id)}
+                          onClick={() => setSelectedIncidentId(inc.incident_id)}
                         >
                           Dispatch
                         </button>
@@ -139,6 +173,8 @@ export default function DispatcherControls({
             ))}
           </div>
         )}
+
+        
 
         {/* 2. CARS VIEW */}
         {activeTab === "cars" && (
