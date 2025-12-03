@@ -1,18 +1,7 @@
 import React from "react";
-import Modal from "../components/shared/Modal";
-import { useLocation, useNavigate } from "react-router-dom";
+import Modal from "../shared/Modal";
 
-const ChangePassword = ({ isOpen, handleClose }) => {
-  return (
-    <>
-      <Modal open={isOpen} onClose={handleClose}>
-        <ChangePasswordForm />
-      </Modal>
-    </>
-  );
-};
-
-const ChangePasswordForm = () => {
+const AddEmergencyUnitForm = () => {
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">
@@ -38,4 +27,5 @@ const ChangePasswordForm = () => {
     </div>
   );
 };
-export default ChangePassword;
+
+export default AddEmergencyUnitForm;

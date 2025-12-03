@@ -1,7 +1,7 @@
 import React from "react";
 import StatCards from "./StatCards";
 import ActivityGraph from "./ActivityGraph";
-import MapView from "./MapView";
+import MapView from"../shared/MapView"
 
 const Grid = () => {
   return (

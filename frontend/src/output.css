@@ -8,22 +8,15 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-blue-200: oklch(88.2% 0.059 254.128);
     --color-blue-500: oklch(62.3% 0.214 259.815);
-    --color-indigo-50: oklch(96.2% 0.018 272.314);
-    --color-indigo-100: oklch(93% 0.034 272.788);
-    --color-indigo-200: oklch(87% 0.065 274.039);
     --color-indigo-300: oklch(78.5% 0.115 274.713);
-    --color-indigo-400: oklch(67.3% 0.182 276.935);
     --color-indigo-500: oklch(58.5% 0.233 277.117);
     --color-slate-100: oklch(96.8% 0.007 247.896);
     --color-slate-500: oklch(55.4% 0.046 257.417);
     --color-slate-700: oklch(37.2% 0.044 257.287);
     --color-slate-800: oklch(27.9% 0.041 260.031);
-    --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-500: oklch(55.1% 0.027 264.364);
-    --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-gray-800: oklch(27.8% 0.033 256.848);
     --color-gray-900: oklch(21% 0.034 264.665);
@@ -391,41 +384,20 @@
   .h-15 {
     height: calc(var(--spacing) * 15);
   }
-  .h-20 {
-    height: calc(var(--spacing) * 20);
-  }
   .h-40 {
     height: calc(var(--spacing) * 40);
-  }
-  .h-\[9vh\] {
-    height: 9vh;
   }
   .h-\[87\%\] {
     height: 87%;
   }
-  .h-\[90vh\] {
-    height: 90vh;
-  }
-  .h-\[95vh\] {
-    height: 95vh;
-  }
   .h-\[96vh\] {
     height: 96vh;
-  }
-  .h-\[97vh\] {
-    height: 97vh;
-  }
-  .h-\[98vh\] {
-    height: 98vh;
-  }
-  .h-\[100vh\] {
-    height: 100vh;
   }
   .h-\[400px\] {
     height: 400px;
   }
-  .h-\[vh\] {
-    height: vh;
+  .h-fit {
+    height: fit-content;
   }
   .h-full {
     height: 100%;
@@ -704,9 +676,6 @@
   }
   .bg-gray-800 {
     background-color: var(--color-gray-800);
-  }
-  .bg-indigo-500 {
-    background-color: var(--color-indigo-500);
   }
   .bg-primary {
     background-color: var(--color-primary);
@@ -1072,13 +1041,6 @@
       }
     }
   }
-  .hover\:bg-black {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-black);
-      }
-    }
-  }
   .hover\:bg-primary\/6 {
     &:hover {
       @media (hover: hover) {
@@ -1250,12 +1212,6 @@
     @media (width >= 48rem) {
       font-size: var(--text-base);
       line-height: var(--tw-leading, var(--text-base--line-height));
-    }
-  }
-  .md\:text-sm {
-    @media (width >= 48rem) {
-      font-size: var(--text-sm);
-      line-height: var(--tw-leading, var(--text-sm--line-height));
     }
   }
   .md\:text-\[56px\] {

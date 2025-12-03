@@ -1,7 +1,7 @@
 import React from "react";
-import police from "../assets/police.jpg";
-import ambulance from "../assets/ambulance.jpg";
-import firefighter from "../assets/fire1.jpg";
+import police from "../../assets/police.jpg";
+import ambulance from "../../assets/ambulance.jpg";
+import firefighter from "../../assets/fire1.jpg";
 
 const Gallery = () => {
   return (

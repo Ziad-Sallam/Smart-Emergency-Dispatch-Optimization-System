@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/website-icon.png";
-import Login from "../pages/Login";
-import Modal from "./Modal";
+import logo from "../../assets/website-icon.png";
+import Login from "../../pages/Login";
+import Modal from "../shared/Modal";
 
 // source: https://prebuiltui.com/components/navbar
 const Navbar = () => {

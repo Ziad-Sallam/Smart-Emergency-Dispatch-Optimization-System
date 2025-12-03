@@ -6,7 +6,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { GoPeople } from "react-icons/go";
 import { RiMapPin2Line } from "react-icons/ri";
-import ChangePassword from "../pages/ChangePassword";
+import ChangePassword from "../../pages/ChangePassword";
 
 const RouteSelect = () => {
   const [openChangePassword, setOpenChangePassword] = React.useState(false);

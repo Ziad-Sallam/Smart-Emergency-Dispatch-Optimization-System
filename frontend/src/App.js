@@ -1,7 +1,7 @@
 import React from "react";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/homepage/Navbar";
 import { Route, Routes, useLocation } from "react-router-dom";
-import Banner from "./components/Banner";
+import Banner from "./components/homepage/Banner";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import AnalyticsPage from "./pages/AnalyticsPage";
@@ -22,7 +22,7 @@ const App = () => {
           <Route path="map" element={<MapPage />} />
           <Route path="users" element={<UserManagment />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="logout" element={<Logout/>} />
+          <Route path="logout" element={<Logout />} />
         </Route>
       </Routes>
     </div>
