@@ -1,70 +1,96 @@
-# Getting Started with Create React App
+# Welcome to Your Miaoda Project
+Miaoda Application Link URL
+    URL:https://medo.dev/projects/app-7yrq0nv9xlhd
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Welcome to Your Miaoda Project
 
-## Available Scripts
+## Project Info
 
-In the project directory, you can run:
+## Project Directory
 
-### `npm start`
+```
+├── README.md # Documentation
+├── components.json # Component library configuration
+├── eslint.config.js # ESLint configuration
+├── index.html # Entry file
+├── package.json # Package management
+├── postcss.config.js # PostCSS configuration
+├── public # Static resources directory
+│   ├── favicon.png # Icon
+│   └── images # Image resources
+├── src # Source code directory
+│   ├── App.tsx # Entry file
+│   ├── components # Components directory
+│   ├── context # Context directory
+│   ├── db # Database configuration directory
+│   ├── hooks # Common hooks directory
+│   ├── index.css # Global styles
+│   ├── layout # Layout directory
+│   ├── lib # Utility library directory
+│   ├── main.tsx # Entry file
+│   ├── routes.tsx # Routing configuration
+│   ├── pages # Pages directory
+│   ├── services # Database interaction directory
+│   ├── types # Type definitions directory
+├── tsconfig.app.json # TypeScript frontend configuration file
+├── tsconfig.json # TypeScript configuration file
+├── tsconfig.node.json # TypeScript Node.js configuration file
+└── vite.config.ts # Vite configuration file
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Tech Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Vite, TypeScript, React, Supabase
 
-### `npm test`
+## Development Guidelines
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### How to edit code locally?
 
-### `npm run build`
+You can choose [VSCode](https://code.visualstudio.com/Download) or any IDE you prefer. The only requirement is to have Node.js and npm installed.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Environment Requirements
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+# Node.js ≥ 20
+# npm ≥ 10
+Example:
+# node -v   # v20.18.3
+# npm -v    # 10.8.2
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Installing Node.js on Windows
 
-### `npm run eject`
+```
+# Step 1: Visit the Node.js official website: https://nodejs.org/, click download. The website will automatically suggest a suitable version (32-bit or 64-bit) for your system.
+# Step 2: Run the installer: Double-click the downloaded installer to run it.
+# Step 3: Complete the installation: Follow the installation wizard to complete the process.
+# Step 4: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Installing Node.js on macOS
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+# Step 1: Using Homebrew (Recommended method): Open Terminal. Type the command `brew install node` and press Enter. If Homebrew is not installed, you need to install it first by running the following command in Terminal:
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+Alternatively, use the official installer: Visit the Node.js official website. Download the macOS .pkg installer. Open the downloaded .pkg file and follow the prompts to complete the installation.
+# Step 2: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### After installation, follow these steps:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+# Step 1: Download the code package
+# Step 2: Extract the code package
+# Step 3: Open the code package with your IDE and navigate into the code directory
+# Step 4: In the IDE terminal, run the command to install dependencies: npm i
+# Step 5: In the IDE terminal, run the command to start the development server: npm run dev -- --host 127.0.0.1
+# Step 6: if step 5 failed, try this command to start the development server: npx vite --host 127.0.0.1
+```
+
+### How to develop backend services?
+
+Configure environment variables and install relevant dependencies.If you need to use a database, please use the official version of Supabase.
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+You can also check the help documentation: Download and Building the app（ [https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en](https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en)）to learn more detailed content.
