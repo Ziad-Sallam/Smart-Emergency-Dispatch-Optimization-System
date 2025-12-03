@@ -13,10 +13,6 @@ function App() {
     [
       {
         path:'/',
-        element:<DispatchDashboard/>
-      },
-      {
-        path:'/login',
         element:<LogIn/>
       },
       {
