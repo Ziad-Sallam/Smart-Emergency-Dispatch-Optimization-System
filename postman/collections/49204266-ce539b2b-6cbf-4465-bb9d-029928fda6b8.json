@@ -54,7 +54,14 @@
 					},
 					"request": {
 						"auth": {
-							"type": "inherit"
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlbWVyZ2VuY3lfZGlzcGF0Y2hlciIsImlhdCI6MTc2NDc2Mzk3NCwiZXhwIjoxNzY0NzcyMDc0LCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6MywidXNlcl9yb2xlIjoiQURNSU4ifQ.qicGOJPkA6ifpY-sbbxP-oB17Lea7UTVWGJzh4pDj_k",
+									"type": "string"
+								}
+							]
 						},
 						"method": "POST",
 						"header": [],
