@@ -53,16 +53,6 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJlbWVyZ2VuY3lfZGlzcGF0Y2hlciIsImlhdCI6MTc2NDc2Mzk3NCwiZXhwIjoxNzY0NzcyMDc0LCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6MywidXNlcl9yb2xlIjoiQURNSU4ifQ.qicGOJPkA6ifpY-sbbxP-oB17Lea7UTVWGJzh4pDj_k",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -218,7 +208,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"y@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"name\": \"y\",\r\n    \"role\": \"ADMIN\"\r\n}",
+							"raw": "{\r\n    \"email\": \"a@gmail.com\",\r\n    \"password\": \"password\",\r\n    \"name\": \"a\",\r\n    \"role\": \"RESPONDER\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -330,7 +320,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"incident_id\" : 21\r\n}",
+							"raw": "{\r\n    \"incident_id\" : 12\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -400,7 +390,7 @@
 					"response": []
 				},
 				{
-					"name": "GET AVG RESPONSE TIME",
+					"name": "Analysis",
 					"id": "49204266-9eb021b8-6f5f-40dd-a208-e69317b39d13",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -424,7 +414,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/admin/incidents/",
+							"raw": "http://127.0.0.1:8000/admin/analytics/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -435,7 +425,7 @@
 							"port": "8000",
 							"path": [
 								"admin",
-								"incidents",
+								"analytics",
 								""
 							]
 						}
