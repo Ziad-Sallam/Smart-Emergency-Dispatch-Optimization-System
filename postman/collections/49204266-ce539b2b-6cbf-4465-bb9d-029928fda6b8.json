@@ -749,7 +749,7 @@
 					"response": []
 				},
 				{
-					"name": "accept incident Copy",
+					"name": "assign vehicle to responder",
 					"id": "49204266-b9384a4b-d031-4525-a86d-cc147e06098c",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
