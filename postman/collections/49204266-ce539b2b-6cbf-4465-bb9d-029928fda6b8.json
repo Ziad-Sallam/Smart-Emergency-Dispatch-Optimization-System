@@ -759,7 +759,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"vehicle_id\": 2\r\n}",
+							"raw": "{\r\n    \"vehicle_id\": 5,\r\n    \"responder_id\": 39\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -767,7 +767,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/accept-incident/",
+							"raw": "http://127.0.0.1:8000/admin/assign-vechile-to-rsponder/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -777,7 +777,8 @@
 							],
 							"port": "8000",
 							"path": [
-								"accept-incident",
+								"admin",
+								"assign-vechile-to-rsponder",
 								""
 							]
 						}
