@@ -487,11 +487,11 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"incident_id\": 16,\r\n    \"new_vehicle_id\": 15\r\n\r\n}",
+							"raw": "{\r\n    \"incident_id\": 1\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -499,7 +499,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/admin/incidents/dispatch/",
+							"raw": "http://127.0.0.1:8000/admin/incidents/dispatches/get-dispatch",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -511,8 +511,8 @@
 							"path": [
 								"admin",
 								"incidents",
-								"dispatch",
-								""
+								"dispatches",
+								"get-dispatch"
 							]
 						}
 					},
