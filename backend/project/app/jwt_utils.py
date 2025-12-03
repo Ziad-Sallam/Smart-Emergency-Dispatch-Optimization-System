@@ -11,7 +11,7 @@ def generate_access_token(user):
     iat = datetime.datetime.now()
     payload = {
         "iss": settings.JWT_ISSUER,
-        "iat": iat,
+        "iat": int(iat.timestamp()),
         "exp": iat + settings.JWT_ACCESS_TOKEN_LIFETIME,
         "type": "access",
         "user_id": user["user_id"],
@@ -28,7 +28,7 @@ def generate_refresh_token(user):
     iat = datetime.datetime.now()
     payload = {
         "iss": settings.JWT_ISSUER,
-        "iat": iat,
+        "iat": int(iat.timestamp()),
         "exp": iat + settings.JWT_REFRESH_TOKEN_LIFETIME,
         "type": "refresh",
         "user_id": user["user_id"],
