@@ -605,7 +605,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"vehicle_id\": 22\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
