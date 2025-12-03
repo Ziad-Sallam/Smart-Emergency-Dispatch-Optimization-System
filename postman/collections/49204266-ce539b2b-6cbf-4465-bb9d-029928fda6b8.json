@@ -595,13 +595,13 @@
 					"response": []
 				},
 				{
-					"name": "Delete Vehicle Copy",
+					"name": "List Stations",
 					"id": "49204266-609a5064-ee12-46ea-8128-9b2a9acd76f2",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "DELETE",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -613,7 +613,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/admin/vehicles/delete/",
+							"raw": "http://127.0.0.1:8000/admin/stations/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -624,8 +624,7 @@
 							"port": "8000",
 							"path": [
 								"admin",
-								"vehicles",
-								"delete",
+								"stations",
 								""
 							]
 						}
