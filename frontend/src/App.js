@@ -5,6 +5,7 @@ import { RouterProvider,createBrowserRouter } from 'react-router-dom';
 import LogIn from './pages/signIn/LogIn.jsx';
 import EmergencyMap from './components/map/EmergencyMap.jsx';
 import Dispatcher from './pages/dispatcher/Dispatcher.jsx';
+import Adduser from './components/add user/Adduser.jsx';
 
 function App() {
   const router= createBrowserRouter(
@@ -20,7 +21,12 @@ function App() {
       {
         path:'/map',
         element:<Dispatcher/>
+      },
+      {
+        path:'/adduser',
+        element:<Adduser/>
       }
+
     ]
   );
   return (

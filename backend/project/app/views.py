@@ -579,8 +579,8 @@ def create_admin_endpoint(request):
                 return JsonResponse({"message": f"Missing required field: {field}"}, status=400)
         
         role = data.get('role', 'DISPATCHER').upper()
-        if role not in ['ADMIN', 'DISPATCHER']:
-            return JsonResponse({"message": "Invalid role. Must be ADMIN or DISPATCHER"}, status=400)
+        if role not in ['ADMIN', 'DISPATCHER' , 'RESPONDER']:
+            return JsonResponse({"message": "Invalid role. Must be ADMIN or DISPATCHER or RESPONDER"}, status=400)
         
         password_hash = hash_password(data['password'])
         

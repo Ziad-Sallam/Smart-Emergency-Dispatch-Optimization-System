@@ -1,0 +1,236 @@
+/* ============================
+   GLOBAL BACKGROUND
+============================ */
+.add-user .bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    background: linear-gradient(70deg, #b00101, #000000, #333333, #b40000);
+    background-size: 400%;
+    animation: glow 30s linear infinite;
+    display: flex;
+}
+
+/* ============================
+   LEFT SIDE TITLE SECTION
+============================ */
+.add-user .bg .title-section {
+    width: 50%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: slideFromLeft 0.8s ease forwards;
+    z-index: 1;
+}
+
+.add-user .bg .Title {
+    font-size: 80px;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.add-user .bg .slogon {
+    margin-top: 10px;
+    font-weight: 700;
+    font-size: 24px;
+    color: #e0e0e0;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    text-align: center;
+}
+
+/* ============================
+   RIGHT SIDE FORM PANEL
+============================ */
+.add-user .main {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #222222;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    animation: slideFromRight 0.8s ease forwards;
+    position: relative;
+    z-index: 2;
+    overflow-y: auto;
+}
+
+/* ============================
+   FORM CARD
+============================ */
+.add-user .wrapper {
+    width: 85%;
+    max-width: 450px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    color: #101010;
+    margin: 20px 0;
+}
+
+.add-user .wrapper h1 {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #19183B;
+}
+
+/* ============================
+   INPUTS
+============================ */
+.add-user .wrapper .input-box {
+    position: relative;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.add-user .input-box input,
+.add-user .input-box select {
+    box-sizing: border-box;
+    width: 100%;
+    height: 50px;
+    background: #fdfdfd;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    padding: 0 40px 0 40px;
+    transition: all 0.3s ease;
+}
+
+.add-user .input-box select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 40px;
+}
+
+.add-user .input-box input:focus,
+.add-user .input-box select:focus {
+    border-color: #000000;
+    box-shadow: 0 0px 8px rgba(255, 0, 0, 0.441);
+}
+
+.add-user .input-box .icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #666;
+    pointer-events: none;
+}
+
+.add-user .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #666;
+}
+
+/* ============================
+   BUTTONS
+============================ */
+.add-user .wrapper .submit {
+    width: 100%;
+    height: 50px;
+    margin-top: 30px;
+    background: #222222;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.add-user .wrapper .submit:hover:not(:disabled) {
+    background: linear-gradient(90deg, #ff0000, #000000);
+    box-shadow: 0 0px 8px rgba(255, 0, 0, 0.441);
+    transform: scale(1.02);
+}
+
+.add-user .wrapper .submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #555;
+}
+
+.add-user .error-msg {
+    color: #d8000c;
+    background-color: #ffbaba;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #d8000c;
+}
+
+.add-user .success-msg {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-align: center;
+    border: 1px solid #4F8A10;
+}
+
+/* ============================
+   ANIMATIONS
+============================ */
+@keyframes glow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes slideFromLeft {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideFromRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* ============================
+   MOBILE RESPONSIVENESS
+============================ */
+@media screen and (max-width: 768px) {
+    .add-user .bg {
+        flex-direction: column;
+    }
+
+    .add-user .bg .title-section {
+        display: none;
+    }
+
+    .add-user .main {
+        width: 100%;
+        height: 100vh;
+        animation: none;
+    }
+
+    .add-user .wrapper {
+        width: 80vw;
+        padding: 20px;
+    }
+}
