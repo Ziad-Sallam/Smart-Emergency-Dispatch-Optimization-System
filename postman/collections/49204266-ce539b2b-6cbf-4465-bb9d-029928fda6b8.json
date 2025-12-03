@@ -517,6 +517,44 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Dispatch Copy",
+					"id": "49204266-45b4dfac-367a-4fc9-a494-5c8deb785a5c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"incident_id\": 16,\r\n    \"new_vehicle_id\": 15\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/admin/incidents/dispatch/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"admin",
+								"incidents",
+								"dispatch",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "49204266-0e6050f0-23d9-4f3d-b1ec-1f7645669594"
