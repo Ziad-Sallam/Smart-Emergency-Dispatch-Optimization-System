@@ -711,6 +711,44 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Create Station Copy",
+					"id": "49204266-1b788d66-367d-4feb-bb41-8f6e0a8c6876",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"POLICE\",\r\n    \"zone\": \"Smouha\",\r\n    \"lat\": 11.000233,\r\n    \"lng\": 33.89990\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/admin/stations/create/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"admin",
+								"stations",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "49204266-0e6050f0-23d9-4f3d-b1ec-1f7645669594"
