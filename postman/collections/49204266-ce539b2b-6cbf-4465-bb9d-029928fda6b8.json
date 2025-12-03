@@ -632,7 +632,7 @@
 					"response": []
 				},
 				{
-					"name": "List Stations Copy",
+					"name": "Create Station",
 					"id": "49204266-a5c3c7ca-918f-4419-a983-96656bbd7b18",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
