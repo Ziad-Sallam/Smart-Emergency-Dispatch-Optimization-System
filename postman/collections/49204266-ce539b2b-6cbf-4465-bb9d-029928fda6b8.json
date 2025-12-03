@@ -630,6 +630,43 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "List Stations Copy",
+					"id": "49204266-a5c3c7ca-918f-4419-a983-96656bbd7b18",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/admin/stations/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"admin",
+								"stations",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "49204266-0e6050f0-23d9-4f3d-b1ec-1f7645669594"
