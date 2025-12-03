@@ -638,11 +638,11 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\r\n    \"type\": \"POLICE\",\r\n    \"zone\": \"Smouha\",\r\n    \"lat\": 11.000233,\r\n    \"lng\": 33.89990\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -650,7 +650,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/admin/stations/",
+							"raw": "http://127.0.0.1:8000/admin/stations/create/",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -662,6 +662,7 @@
 							"path": [
 								"admin",
 								"stations",
+								"create",
 								""
 							]
 						}
