@@ -89,7 +89,9 @@ export default function EmergencyMap({ stations,cars,allIncidents, route, focuse
         {/* Stations */}
         {stations.map((st) => (
           <Marker key={st.station_id} latitude={st.lat} longitude={st.lng} anchor="bottom" onClick={e => { e.originalEvent.stopPropagation(); setSelectedItem(st); }}>
-            <div style={{ fontSize: "25px", cursor: "pointer" }}>🏥</div>
+            <div style={{ fontSize: "25px", cursor: "pointer" }}>
+              {st.type === "FIRE" ? "🏣" : st.type === "POLICE" ? "🏟️" : "🏥"}
+              </div>
           </Marker>
         ))}
 
@@ -107,7 +109,7 @@ export default function EmergencyMap({ stations,cars,allIncidents, route, focuse
           car => (
           <Marker key={car.vehicle_id} latitude={car.lat} longitude={car.lng} anchor="center">
            <div style={{ fontSize: "30px", transition: "transform 1.5s linear" }}>
-              {car.type === "Ambulance" ? "🚑" : car.type === "Fire Truck" ? "🚒" : "🚓"}
+              {car.vehicle_type === "MEDICAL" ? "🚑" : car.vehicle_type === "FIRE" ? "🚒" : "🚓"}
             </div>
         </Marker>
       ))}

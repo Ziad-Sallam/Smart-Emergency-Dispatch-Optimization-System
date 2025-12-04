@@ -39,60 +39,129 @@ VALUES
 
 INSERT INTO station (zone, location, type)
 VALUES
- ('Smouha', ST_GeomFromText('POINT(29.9540 31.2010)', 4326), 'POLICE'),
- ('ElAgamy', ST_GeomFromText('POINT(29.7750 31.1160)', 4326), 'POLICE'),
- ('SabaPasha', ST_GeomFromText('POINT(29.9300 31.2390)', 4326), 'POLICE'),
- ('SabaPasha', ST_GeomFromText('POINT(29.9320 31.2410)', 4326), 'MEDICAL'),
- ('Roushdy', ST_GeomFromText('POINT(29.9480 31.2290)', 4326), 'FIRE'),
- ('Gleem', ST_GeomFromText('POINT(29.9380 31.2380)', 4326), 'MEDICAL'),
- ('Smouha', ST_GeomFromText('POINT(29.9560 31.2030)', 4326), 'FIRE'),
- ('Kabbary', ST_GeomFromText('POINT(29.8780 31.1890)', 4326), 'POLICE');
+  -- Smouha (Near Smouha Club & Victor Emanuel Sq)
+  ('Smouha',    ST_GeomFromText('POINT(29.9455 31.2125)', 4326), 'POLICE'),
+  
+  -- El Agamy (Main Road near Hanoville)
+  ('ElAgamy',   ST_GeomFromText('POINT(29.7650 31.0850)', 4326), 'POLICE'),
+  
+  -- Saba Pasha (On the Tram line, definitely on land)
+  ('SabaPasha', ST_GeomFromText('POINT(29.9620 31.2310)', 4326), 'POLICE'),
+  ('SabaPasha', ST_GeomFromText('POINT(29.9635 31.2305)', 4326), 'MEDICAL'),
+  
+  -- Roushdy (Near Syria Street)
+  ('Roushdy',   ST_GeomFromText('POINT(29.9490 31.2270)', 4326), 'FIRE'),
+  
+  -- Gleem (Between Tram and Corniche)
+  ('Gleem',     ST_GeomFromText('POINT(29.9580 31.2340)', 4326), 'MEDICAL'),
+  
+  -- Smouha (Fire station near 14th May Bridge)
+  ('Smouha',    ST_GeomFromText('POINT(29.9390 31.2100)', 4326), 'FIRE'),
+  
+  -- Kabbary (Near the Port/Bridge)
+  ('Kabbary',   ST_GeomFromText('POINT(29.8650 31.1680)', 4326), 'POLICE');
 
 INSERT INTO `vehicle` (`location`, `capacity`, `station_id`)
 VALUES
- (ST_GeomFromText('POINT(29.9525 31.2015)', 4326), 3, 1), 
- (ST_GeomFromText('POINT(29.9530 31.2005)', 4326), 2, 1),
- (ST_GeomFromText('POINT(29.7745 31.1168)', 4326), 3, 2), 
- (ST_GeomFromText('POINT(29.7755 31.1155)', 4326), 2, 2),
- (ST_GeomFromText('POINT(29.9290 31.2395)', 4326), 4, 3), 
- (ST_GeomFromText('POINT(29.9310 31.2385)', 4326), 4, 3),
- (ST_GeomFromText('POINT(29.9325 31.2405)', 4326), 2, 4), 
- (ST_GeomFromText('POINT(29.9315 31.2415)', 4326), 2, 4),
- (ST_GeomFromText('POINT(29.9475 31.2295)', 4326), 5, 5), 
- (ST_GeomFromText('POINT(29.9485 31.2285)', 4326), 1, 5),
- (ST_GeomFromText('POINT(29.9470 31.2280)', 4326), 2, 5),
- (ST_GeomFromText('POINT(29.9375 31.2385)', 4326), 3, 6), 
- (ST_GeomFromText('POINT(29.9385 31.2375)', 4326), 2, 6),
- (ST_GeomFromText('POINT(29.9370 31.2370)', 4326), 2, 6),
- (ST_GeomFromText('POINT(29.9555 31.2035)', 4326), 3, 7), 
- (ST_GeomFromText('POINT(29.9565 31.2025)', 4326), 3, 7),
- (ST_GeomFromText('POINT(29.9570 31.2040)', 4326), 3, 7),
- (ST_GeomFromText('POINT(29.8775 31.1895)', 4326), 5, 8), 
- (ST_GeomFromText('POINT(29.8785 31.1885)', 4326), 2, 8),
- (ST_GeomFromText('POINT(29.8790 31.1900)', 4326), 2, 8);
+  -- Smouha Police Vehicles
+  (ST_GeomFromText('POINT(29.9456 31.2126)', 4326), 3, 1),
+  (ST_GeomFromText('POINT(29.9454 31.2124)', 4326), 2, 1),
+  
+  -- Agamy Police Vehicles
+  (ST_GeomFromText('POINT(29.7652 31.0852)', 4326), 3, 2),
+  (ST_GeomFromText('POINT(29.7648 31.0848)', 4326), 2, 2),
+  
+  -- Saba Pasha Police
+  (ST_GeomFromText('POINT(29.9622 31.2312)', 4326), 4, 3),
+  (ST_GeomFromText('POINT(29.9618 31.2308)', 4326), 4, 3),
+  
+  -- Saba Pasha Medical (Ambulances)
+  (ST_GeomFromText('POINT(29.9637 31.2307)', 4326), 2, 4),
+  (ST_GeomFromText('POINT(29.9633 31.2303)', 4326), 2, 4),
+  
+  -- Roushdy Fire Trucks
+  (ST_GeomFromText('POINT(29.9492 31.2272)', 4326), 5, 5),
+  (ST_GeomFromText('POINT(29.9488 31.2268)', 4326), 1, 5),
+  (ST_GeomFromText('POINT(29.9490 31.2275)', 4326), 2, 5),
+  
+  -- Gleem Ambulances
+  (ST_GeomFromText('POINT(29.9582 31.2342)', 4326), 3, 6),
+  (ST_GeomFromText('POINT(29.9578 31.2338)', 4326), 2, 6),
+  (ST_GeomFromText('POINT(29.9585 31.2345)', 4326), 2, 6),
+  
+  -- Smouha Fire Trucks
+  (ST_GeomFromText('POINT(29.9392 31.2102)', 4326), 3, 7),
+  (ST_GeomFromText('POINT(29.9388 31.2098)', 4326), 3, 7),
+  (ST_GeomFromText('POINT(29.9395 31.2105)', 4326), 3, 7),
+  
+  -- Kabbary Police
+  (ST_GeomFromText('POINT(29.8652 31.1682)', 4326), 5, 8),
+  (ST_GeomFromText('POINT(29.8648 31.1678)', 4326), 2, 8),
+  (ST_GeomFromText('POINT(29.8655 31.1685)', 4326), 2, 8);
 
 INSERT INTO `incident` (`location`, `time_reported`, `type`, `severity_level`, `status`)
 VALUES
- (ST_GeomFromText('POINT(29.91 31.22)', 4326), '2025-10-26 14:34:57', 'POLICE', 'MEDIUM', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.98 31.18)', 4326), '2025-10-28 13:03:12', 'FIRE', 'HIGH', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.85 31.24)', 4326), '2025-10-28 17:02:44', 'MEDICAL', 'HIGH', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.93 31.17)', 4326), '2025-11-02 05:29:48', 'POLICE', 'LOW', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.94 31.20)', 4326), '2025-10-31 12:42:57', 'POLICE', 'LOW', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.88 31.23)', 4326), '2025-11-01 13:42:41', 'FIRE', 'MEDIUM', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.90 31.19)', 4326), '2025-10-27 11:45:28', 'MEDICAL', 'LOW', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.96 31.25)', 4326), '2025-10-28 04:31:45', 'MEDICAL', 'CRITICAL', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.89 31.16)', 4326), '2025-11-01 20:00:32', 'POLICE', 'HIGH', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.92 31.24)', 4326), '2025-11-02 04:41:20', 'POLICE', 'CRITICAL', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.95 31.21)', 4326), '2025-11-02 12:15:00', 'MEDICAL', 'LOW', 'RESOLVED'),
- (ST_GeomFromText('POINT(29.87 31.19)', 4326), '2025-11-02 13:00:00', 'FIRE', 'HIGH', 'ASSIGNED'),
- (ST_GeomFromText('POINT(29.97 31.22)', 4326), '2025-11-02 08:15:00', 'FIRE', 'MEDIUM', 'ASSIGNED'),
- (ST_GeomFromText('POINT(29.90 31.20)', 4326), '2025-11-02 10:05:00', 'MEDICAL', 'HIGH', 'ASSIGNED'),
- (ST_GeomFromText('POINT(29.96 31.23)', 4326), '2025-11-02 09:10:00', 'POLICE', 'LOW', 'ASSIGNED'),
- (ST_GeomFromText('POINT(29.98 31.17)', 4326), '2025-11-02 11:00:00', 'FIRE', 'CRITICAL', 'ASSIGNED'),
- (ST_GeomFromText('POINT(29.91 31.24)', 4326), '2025-11-02 11:30:00', 'POLICE', 'MEDIUM', 'REPORTED'),
- (ST_GeomFromText('POINT(29.93 31.18)', 4326), '2025-11-02 14:20:00', 'POLICE', 'CRITICAL', 'REPORTED'),
- (ST_GeomFromText('POINT(29.95 31.20)', 4326), '2025-11-02 15:45:00', 'MEDICAL', 'MEDIUM', 'REPORTED'),
- (ST_GeomFromText('POINT(29.89 31.21)', 4326), '2025-11-02 16:30:00', 'FIRE', 'LOW', 'REPORTED');
+  -- Mansheya / City Center (Crowded area)
+  (ST_GeomFromText('POINT(29.8850 31.1980)', 4326), '2025-10-26 14:34:57', 'POLICE', 'MEDIUM', 'RESOLVED'),
+  
+  -- Stanley Bridge area (High traffic)
+  (ST_GeomFromText('POINT(29.9480 31.2360)', 4326), '2025-10-28 13:03:12', 'FIRE', 'HIGH', 'RESOLVED'),
+  
+  -- Sidi Gaber Station area
+  (ST_GeomFromText('POINT(29.9420 31.2150)', 4326), '2025-10-28 17:02:44', 'MEDICAL', 'HIGH', 'RESOLVED'),
+  
+  -- Maamoura / East
+  (ST_GeomFromText('POINT(30.0100 31.2700)', 4326), '2025-11-02 05:29:48', 'POLICE', 'LOW', 'RESOLVED'),
+  
+  -- Karmouz (South)
+  (ST_GeomFromText('POINT(29.8950 31.1800)', 4326), '2025-10-31 12:42:57', 'POLICE', 'LOW', 'RESOLVED'),
+  
+  -- Near Bibliotheca Alexandrina
+  (ST_GeomFromText('POINT(29.9090 31.2090)', 4326), '2025-11-01 13:42:41', 'FIRE', 'MEDIUM', 'RESOLVED'),
+  
+  -- Sporting Club
+  (ST_GeomFromText('POINT(29.9320 31.2180)', 4326), '2025-10-27 11:45:28', 'MEDICAL', 'LOW', 'RESOLVED'),
+  
+  -- Camp Caesar
+  (ST_GeomFromText('POINT(29.9150 31.2100)', 4326), '2025-10-28 04:31:45', 'MEDICAL', 'CRITICAL', 'RESOLVED'),
+  
+  -- El Max (West)
+  (ST_GeomFromText('POINT(29.8400 31.1550)', 4326), '2025-11-01 20:00:32', 'POLICE', 'HIGH', 'RESOLVED'),
+  
+  -- Victoria / East
+  (ST_GeomFromText('POINT(29.9800 31.2550)', 4326), '2025-11-02 04:41:20', 'POLICE', 'CRITICAL', 'RESOLVED'),
+  
+  -- Miami
+  (ST_GeomFromText('POINT(29.9950 31.2650)', 4326), '2025-11-02 12:15:00', 'MEDICAL', 'LOW', 'RESOLVED'),
+  
+  -- ACTIVE INCIDENTS BELOW --
+  
+  -- Fire near Green Plaza (Smouha)
+  (ST_GeomFromText('POINT(29.9600 31.2050)', 4326), '2025-11-02 13:00:00', 'FIRE', 'HIGH', 'ASSIGNED'),
+  
+  -- Fire in Bahary (Old Town)
+  (ST_GeomFromText('POINT(29.8750 31.2050)', 4326), '2025-11-02 08:15:00', 'FIRE', 'MEDIUM', 'ASSIGNED'),
+  
+  -- Medical Emergency in Laurent
+  (ST_GeomFromText('POINT(29.9700 31.2450)', 4326), '2025-11-02 10:05:00', 'MEDICAL', 'HIGH', 'ASSIGNED'),
+  
+  -- Police Issue in Moharam Bek
+  (ST_GeomFromText('POINT(29.9100 31.1950)', 4326), '2025-11-02 09:10:00', 'POLICE', 'LOW', 'ASSIGNED'),
+  
+  -- Critical Fire in Amreya (Industrial Zone)
+  (ST_GeomFromText('POINT(29.8000 31.0500)', 4326), '2025-11-02 11:00:00', 'FIRE', 'CRITICAL', 'ASSIGNED'),
+  
+  -- New Report: Car accident on Desert Road entrance
+  (ST_GeomFromText('POINT(29.9000 31.1500)', 4326), '2025-11-02 11:30:00', 'POLICE', 'MEDIUM', 'REPORTED'),
+  
+  -- New Report: Fight in San Stefano
+  (ST_GeomFromText('POINT(29.9650 31.2430)', 4326), '2025-11-02 14:20:00', 'POLICE', 'CRITICAL', 'REPORTED'),
+  
+  -- New Report: Sick person in Asafra
+  (ST_GeomFromText('POINT(30.0050 31.2750)', 4326), '2025-11-02 15:45:00', 'MEDICAL', 'MEDIUM', 'REPORTED'),
+  
+  -- New Report: Small fire in Gianaclis
+  (ST_GeomFromText('POINT(29.9680 31.2380)', 4326), '2025-11-02 16:30:00', 'FIRE', 'LOW', 'REPORTED');
 
 INSERT INTO responder_vehicle (`vehicle_id`, `responder_id`)
 VALUES

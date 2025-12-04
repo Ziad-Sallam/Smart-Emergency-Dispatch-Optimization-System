@@ -146,7 +146,7 @@
     background: #2c2a63;
 }
 
-.add-button-incident button{
+.add-button-incident{
     padding: 8px 12px;
     border: none;
     height: 35px;
@@ -159,12 +159,12 @@
     cursor: pointer;
 }
 
-.add-button-incident button:hover{
+.add-button-incident:hover{
     background: rgb(169, 0, 0);
     transition: 0.3s;
 }
 
-.add-button-car button{
+.add-button-car{
     padding: 8px 12px;
     border: none;
     height: 35px;
@@ -177,12 +177,31 @@
     cursor: pointer;
 }
 
-.add-button-car button:hover{
+.add-button-car:hover{
     background: #005ab9;
     transition: 0.3s;
 }
 
-.add-button-station button{
+.delete-button{
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    color: #d32f2f;
+    background: #fdecea;
+    border: none;
+    width: 70px; 
+    height: 30px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.delete-button:hover{
+    background: #f9c6c4;
+    transition: 0.3s;
+}
+
+.add-button-station{
     padding: 8px 12px;
     border: none;
     height: 35px;
@@ -195,7 +214,7 @@
     cursor: pointer;
 }
 
-.add-button-station button:hover{
+.add-button-station:hover{
     background: #1e7c34;
     transition: 0.3s;
 }
@@ -245,3 +264,109 @@
 .status-badge.available { color: #28a745; background: #e6f9e9;width: 70px; height: 20px; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;}
 .status-badge.on_route { color: #d32f2f; background: #fdecea;width: 70px; height: 20px; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;}
 .status-badge.pending { color: #f57c00; background: #fff4e5;width: 70px; height: 20px; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;}
+
+/* ADD BUTTONS */
+.add-button-container {
+  padding: 0 0 15px 0;
+  text-align: center;
+}
+
+.btn-add {
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background-color: #218838;
+}
+
+/* FORMS */
+.add-form {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  animation: fadeIn 0.3s ease;
+}
+
+.add-form h3 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.add-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.add-form input,
+.add-form select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row > div {
+  flex: 1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-save {
+  flex: 1;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-save:hover {
+  background: #0056b3;
+}
+
+.add-form .btn-cancel {
+  flex: 1;
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-form .btn-cancel:hover {
+  background: #5a6268;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
