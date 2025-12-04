@@ -231,8 +231,7 @@ npm start
 ```
 Frontend will run on `http://localhost:3000`
 
-![Setup Guide](screenshots/setup.png)
-*Installation Process*
+
 
 ---
 
@@ -350,6 +349,8 @@ LIMIT 1;
 ```
 
 ![Analytics Dashboard](screenshots/analytics.png)
+![Analytics Dashboard](screenshots/analytics2.png)
+![Analytics Dashboard](screenshots/analytics3.png)
 *Performance Analytics*
 
 ---
@@ -392,8 +393,7 @@ LIMIT 1;
 - Email: `ramy236@gmail.com`
 - Password: `password`
 
-![User Roles](screenshots/roles.png)
-*User Role Hierarchy*
+
 
 ---
 
@@ -833,39 +833,21 @@ Response:
 ![Vehicle Panel](screenshots/vehicle_panel.png)
 *Vehicle monitoring with status indicators*
 
-### Map Interface
-![Map View](screenshots/map_main.png)
-*Interactive map with incident markers*
 
-![Map Filters](screenshots/map_filters.png)
-*Filter controls for incident types*
-
-![Route Display](screenshots/map_route.png)
-*Route visualization for dispatched units*
-
-### Incident Management
-![Dispatch Modal](screenshots/dispatch_modal.png)
-*Vehicle selection for incident assignment*
-
-![Incident Details](screenshots/incident_details.png)
-*Detailed incident information popup*
 
 ### Analytics Dashboard
-![Analytics Overview](screenshots/analytics_overview.png)
+![Analytics Overview](screenshots/analytics.png)
 *Comprehensive analytics dashboard*
 
-![Performance Metrics](screenshots/performance_metrics.png)
+![Performance Metrics](screenshots/analytics2.png)
 *Response time and resolution rate charts*
 
-![Responder Stats](screenshots/responder_stats.png)
+![Responder Stats](screenshots/analytics3.png)
 *Individual responder performance*
 
 ### User Management
 ![Add User](screenshots/add_user.png)
 *Admin user creation interface*
-
-![User List](screenshots/user_list.png)
-*User management panel*
 
 ---
 
@@ -993,9 +975,6 @@ Response:
   - Simplifies data model
   - Real-world crews modeled via capacity field
 - **Limitation:** Doesn't track individual crew members
-
-![Assumptions](screenshots/assumptions.png)
-*Key Design Decisions*
 
 
 ---
