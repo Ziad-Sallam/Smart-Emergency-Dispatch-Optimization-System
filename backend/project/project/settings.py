@@ -44,12 +44,14 @@ ALLOWED_HOSTS = []
 #     'app',
 # ]
 INSTALLED_APPS = [
-    
+    'daphne',
     'app',
     'corsheaders',
     "channels",
     "ws"
 ]
+
+ASGI_APPLICATION = "project.asgi.application"
 
 CORS_ALLOW_ALL_ORIGINS = True
 

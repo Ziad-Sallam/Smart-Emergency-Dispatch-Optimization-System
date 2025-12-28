@@ -31,9 +31,27 @@ def convert_for_json(obj):
 
 
 class WSActions:
-    def __init__(self, scope):
+    def __init__(self, scope, channel_layer=None):
         self.scope = scope
         self.user = scope.get("user")
+        self.channel_layer = channel_layer
+
+    async def _broadcast(self, group_name, message, action_type=None):
+        """Helper to broadcast messages to a channel group."""
+        if not self.channel_layer:
+            print("No channel layer available for broadcast")
+            return
+            
+        if action_type:
+            message['action'] = action_type
+            
+        await self.channel_layer.group_send(
+            group_name,
+            {
+                "type": "broadcast_message",
+                "message": message
+            }
+        )
 
     async def action_send_message(self, data):
         return {"action": "message_received", "message": data.get("message", "")}
@@ -111,6 +129,17 @@ class WSActions:
             )
             incident = convert_decimals(incident)
             
+            # Broadcast update
+            await self._broadcast("group_ADMIN", incident, "incident_updated")
+            await self._broadcast("group_DISPATCHER", incident, "incident_updated")
+            
+            # Notify the specific responder if vehicle is assigned
+            # We need to find the responder user_id associated with this vehicle to notify them directly
+            # For now, broadcasting to all responders might be noisy, so we rely on them polling or 
+            # we need a way to look up vehicle->responder. 
+            # Assuming 'vehicle' key in incident has enough info or we can fetch it.
+            # Ideally: await self._broadcast(f"user_{responder_id}", incident, "new_dispatch")
+            
             return {
                 "action": "dispatch_incident_response",
                 "message": "Dispatch modified successfully",
@@ -179,6 +208,9 @@ class WSActions:
             )
             vehicle = convert_decimals(vehicle)
             
+            await self._broadcast("group_ADMIN", vehicle, "vehicle_created")
+            await self._broadcast("group_DISPATCHER", vehicle, "vehicle_created")
+
             return {
                 "action": "create_vehicle_response",
                 "message": "Vehicle created successfully",
@@ -199,6 +231,9 @@ class WSActions:
             delete_veh = sync_to_async(repo.delete_vehicle)
             await delete_veh(vehicle_id)
             
+            await self._broadcast("group_ADMIN", {"vehicle_id": vehicle_id}, "vehicle_deleted")
+            await self._broadcast("group_DISPATCHER", {"vehicle_id": vehicle_id}, "vehicle_deleted")
+
             return {
                 "action": "delete_vehicle_response",
                 "message": "Vehicle deleted successfully"
@@ -247,6 +282,8 @@ class WSActions:
                 lng=data['lng']
             )
             station = convert_decimals(station)
+            
+            await self._broadcast("group_ADMIN", station, "station_created")
             
             return {
                 "action": "create_station_response",
@@ -302,6 +339,8 @@ class WSActions:
             if admin and 'password' in admin:
                 admin.pop('password')
             
+            await self._broadcast("group_ADMIN", admin, "admin_created")
+
             return {
                 "action": "create_admin_response",
                 "message": "User created successfully",
@@ -337,6 +376,10 @@ class WSActions:
             )
             incident = convert_decimals(incident)
             
+            # Broadcast to admins and dispatchers
+            await self._broadcast("group_ADMIN", incident, "new_incident")
+            await self._broadcast("group_DISPATCHER", incident, "new_incident")
+            
             return {
                 "action": "report_incident_response",
                 "message": "Incident reported and vehicle auto-assigned successfully",
@@ -362,6 +405,16 @@ class WSActions:
             )
             vehicle = convert_decimals(vehicle)
             
+            # Broadcast location update
+            payload = {
+                "vehicle_id": vehicle.get("vehicle_id"),
+                "lat": vehicle.get("lat"),
+                "lng": vehicle.get("lng"),
+                "status": vehicle.get("status")
+            }
+            await self._broadcast("group_ADMIN", payload, "unit_location_updated")
+            await self._broadcast("group_DISPATCHER", payload, "unit_location_updated")
+
             return {
                 "action": "update_unit_location_response",
                 "message": "Location updated successfully",
@@ -379,6 +432,9 @@ class WSActions:
             incident = await resolve(data['incident_id'])
             incident = convert_decimals(incident)
             
+            await self._broadcast("group_ADMIN", incident, "incident_resolved")
+            await self._broadcast("group_DISPATCHER", incident, "incident_resolved")
+
             return {
                 "action": "resolve_incident_response",
                 "message": "Incident resolved successfully",
@@ -393,66 +449,24 @@ class WSActions:
                 return {"action": "error", "message": "Unauthorized"}
 
             if "vehicle_id" not in data:
-                 return {"action": "error", "message": "please enter vehicle_id"} # Typo copied from views.py logic, but "vehicle_id" seems to require incident id in line 641... 
-                 # Wait, looking at views.py line 640:
-                 # if not data["vehicle_id"]: return ... "please entre incident_id"
-                 # It checks vehicle_id but message says incident_id. And then calls get_incident_by_id(data["vehicle_id"]) ??
-                 # It seems views.py has logic errors or confusion. 
-                 # I will implement what makes sense or copy exactly.
-                 # "update_vehicles_to_on_route_by_incident(data["vehicle_id"])" -> this function likely expects incident_id if named "by_incident".
-                 # But repo.py check needed to be sure.
-                 # For now, I'll trust the views.py *intent* even if variables are messy, but I'll try to be safer.
-                 # views.py: update_vehicles_to_on_route_by_incident(data["vehicle_id"])
+                 return {"action": "error", "message": "please enter vehicle_id"}
                  
             vehicle_id = data.get("vehicle_id")
             
             update_route = sync_to_async(repo.update_vehicles_to_on_route_by_incident)
-            get_inc = sync_to_async(repo.get_incident_by_id) # This call was weird in views.py
             get_veh = sync_to_async(repo.get_vehicle_by_id)
-            
-            # views.py line 642: update_vehicles_to_on_route_by_incident(data["vehicle_id"])
-            await update_route(vehicle_id)
-            
-            # views.py line 643: get_incident_by_id(data["vehicle_id"]) - effectively does nothing with result?
-            # It just calls it. Maybe side effect? Unlikely for a get.
-            
-            # views.py line 645: returns get_vehicle_by_id(data["incident_id"])
-            # Wait, views.py used data["incident_id"] in return but data["vehicle_id"] in update.
-            # And the check was for vehicle_id.
-            
-            # I will assume the input expects 'vehicle_id' and 'incident_id' properly or one of them.
-            # Let's just wrap existing logic but safely.
-            
-            # Re-reading views.py pendingToOnRoute carefully:
-            # check data["vehicle_id"]
-            # update_vehicles_to_on_route_by_incident(data["vehicle_id"])
-            # returns get_vehicle_by_id(data["incident_id"]) <--- ERROR in views.py if incident_id not in data
-            
-            # I'll try to fix it: update expects incident_id probably?
-            # Let's assume the user sends meaningful data.
-            
-            incident_id = data.get("incident_id")
-            
-            if incident_id:
-                 # Maybe the view meant update by incident id?
-                 pass
-
-            # I will stick to exact translation of views.py code lines where possible to avoid changing behavior unless it's strictly broken.
-            # But the 'return' in views.py uses incident_id which might be missing.
             
             await update_route(vehicle_id)
             
             # response uses incident_id
             response_data = {}
             if "incident_id" in data:
-                 veh = await get_veh(data["incident_id"]) # views.py passes incident_id to get_vehicle? That seems wrong too.
+                 veh = await get_veh(data["incident_id"]) 
                  response_data = veh
             
-            # This specific view seems very buggy in the original file. 
-            # I will create the action but maybe add a TODO or fix obvious variable mixups if I can guess intent.
-            # Intuitively: update vehicle status to on-route. 
-            # Repo: update_vehicles_to_on_route_by_incident. Likely takes incident_id.
-            
+            await self._broadcast("group_ADMIN", {"vehicle_id": vehicle_id, "status": "ON_ROUTE"}, "vehicle_status_updated")
+            await self._broadcast("group_DISPATCHER", {"vehicle_id": vehicle_id, "status": "ON_ROUTE"}, "vehicle_status_updated")
+
             return {
                 "action": "pending_to_on_route_response",
                 "data": convert_decimals(response_data)
@@ -477,6 +491,16 @@ class WSActions:
             
             vehicle = await get_v(data["vehicle_id"]) 
             
+            payload = {
+                "responder": convert_decimals(usr),
+                "vehicle": convert_decimals(vehicle)
+            }
+            await self._broadcast("group_ADMIN", payload, "vehicle_assignment_updated")
+            await self._broadcast("group_DISPATCHER", payload, "vehicle_assignment_updated")
+            
+            # Notify the specific responder
+            await self._broadcast(f"user_{data['responder_id']}", payload, "you_are_assigned")
+
             return {
                 "action": "assign_responder_to_vehicle_response",
                 "user": convert_decimals(usr),
