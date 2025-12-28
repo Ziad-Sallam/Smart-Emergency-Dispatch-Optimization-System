@@ -218,6 +218,31 @@ def report_incident(request):
             description=data.get('description', '')
         )
         
+        # Trigger WebSocket update
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            from ws.ws_actions import convert_decimals, convert_for_json
+        
+            channel_layer = get_channel_layer()
+            incidents = get_all_incidents(None)
+            incidents = convert_decimals(incidents)
+            incidents = convert_for_json(incidents)
+            
+            async_to_sync(channel_layer.group_send)(
+                "all_users",
+                {
+                    "type": "user_message",
+                    "message": {
+                        "action": "list_incidents_response",
+                        "incidents": incidents,
+                        "count": len(incidents)
+                    }
+                }
+            )
+        except Exception as ws_error:
+            print(f"WebSocket trigger failed: {str(ws_error)}")
+        
         return JsonResponse({
             "message": "Incident reported and vehicle auto-assigned successfully",
             "incident": incident
