@@ -146,3 +146,9 @@ JWT_ACCESS_TOKEN_LIFETIME = datetime.timedelta(minutes=15)
 JWT_REFRESH_TOKEN_LIFETIME = datetime.timedelta(days=7)
 JWT_ISSUER = "emergency_dispatcher"  
 JWT_AUTH_HEADER = "AUTHORIZATION"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

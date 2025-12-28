@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +8,7 @@ from .jwt_utils import generate_access_token, generate_refresh_token, refresh_ac
 from .auth import auth_user 
 from .repo import *
 import json
+from asgiref.sync import async_to_sync
 
 
 # Create your views here.
@@ -602,12 +604,9 @@ def create_admin_endpoint(request):
         return JsonResponse({"message": str(e)}, status=500)
 
 
-def get_analytics(request):
+async def get_analytics(request):
     """Get system analytics - placeholder"""
-    err = check_request_method(request, "GET")
-    if err:
-        return JsonResponse({"message": str(err)}, status=400)
-
+    print("hweeetteeeerrg")
     try:
         # Placeholder analytics data
         analytics = {}
@@ -620,15 +619,11 @@ def get_analytics(request):
         analytics["worst_station"] = get_worst_station()
         analytics["total_incidents_type"] = get_incidents_by_type_detailed()
         analytics["active_vehicles_type"] = get_vehicle_count_by_type()
-
-        
-        return JsonResponse({
-            "analytics": analytics
-        }, status=200)
-        
+        print("hweeetteeeerrg")
+        return {"analytics": analytics}
     except Exception as e:
-        return JsonResponse({"message": str(e)}, status=500)
-
+        return {"message": str(e)}
+        
 @csrf_exempt
 @auth_user
 def pendingToOnRoute(request):
