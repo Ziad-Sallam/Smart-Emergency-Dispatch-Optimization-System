@@ -1,7 +1,7 @@
 /* CONTAINER */
 .dispatcher-controls {
     background-color: #f8f9fa;
-    width: 25vw;
+    width: 100%;
     min-width: 300PX;
     height: 100%;
     display: flex;

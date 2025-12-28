@@ -49,6 +49,7 @@ export default function EmergencyMap({
   isAddingCar,
   isAddingIncident,
   isAddingStation,
+  showPanel,
 }){
 
   // 1. CREATE A REF FOR THE MAP
@@ -80,9 +81,9 @@ export default function EmergencyMap({
   }, [focusedLocation]);
 
   return (
-    <div className="map-container">
+    <div className="map">
       {/* Control Panel (Keeping your existing UI) */}
-      <div style={panelStyle}>
+      {showPanel && <div style={panelStyle}>
         <div style={{ marginBottom: "15px" }}>
           <label style={{ fontWeight: "bold", fontSize: "12px" }}>
             Filter Incidents:
@@ -139,7 +140,7 @@ export default function EmergencyMap({
             Dark
           </button>
         </div>
-      </div>
+      </div>}
 
       <Map
         ref={mapRef} // 3. ATTACH THE REF HERE
