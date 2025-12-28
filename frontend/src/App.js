@@ -8,6 +8,7 @@ import Dispatcher from './pages/dispatcher/Dispatcher.jsx';
 import Adduser from './components/add user/Adduser.jsx';
 import Analytics from './pages/Analytics/Analytics.jsx';
 import ReporterPage from './pages/reporter/ReporterPage.jsx';
+import ResponderPage from './pages/reporter/ResponderPage.jsx';
 
 function App() {
   const router = createBrowserRouter(
@@ -31,6 +32,10 @@ function App() {
       {
         path: '/reporter',
         element: <ReporterPage />,
+      },
+      {
+        path: '/responder',
+        element: <ResponderPage />,
       },
     ]
   );
