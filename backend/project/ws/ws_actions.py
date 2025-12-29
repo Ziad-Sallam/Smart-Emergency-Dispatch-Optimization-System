@@ -466,7 +466,7 @@ class WSActions:
             return {
                 "action": "resolve_incident_response",
                 "message": "Incident resolved successfully",
-                "incident": incident
+                "incident": convert_for_json(incident)
             }
         except Exception as e:
             return {"action": "error", "message": str(e)}
