@@ -50,7 +50,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         actions = WSActions(self.scope, self.channel_layer)
         
         # Try to find the handler with 'action_' prefix
-        method_name = f"action_{action}"
+        method_name = f"{action}"
         if hasattr(actions, method_name):
             handler = getattr(actions, method_name)
             if asyncio.iscoroutinefunction(handler):
