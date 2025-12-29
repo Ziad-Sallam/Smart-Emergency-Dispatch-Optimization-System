@@ -632,10 +632,7 @@ class WSActions:
             return {"action": "error", "message": str(e)}
     
     async def action_dispatch_vehicle(self, data):
-        try:
-            if not self.user or self.user['role'] != 'ADMIN':
-                return {"action": "error", "message": "Unauthorized - Admin only"}
-            
+        try:    
             await dispatch_vehicle_to_destination(data["vehicle_id"], data["end_lng"], data["end_lat"], data["start_lng"] if data["start_lng"] else None, data["start_lat"] if data["start_lat"] else None)
             
             return {"action": "dispatch_vehicle_response"}
