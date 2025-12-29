@@ -9,6 +9,7 @@ import Adduser from './components/add user/Adduser.jsx';
 import Analytics from './pages/Analytics/Analytics.jsx';
 import ReporterPage from './pages/reporter/ReporterPage.jsx';
 import ResponderPage from './pages/reporter/ResponderPage.jsx';
+import { NotificationProvider } from './components/Notificatoions/NotificationContext';
 
 function App() {
   const router = createBrowserRouter(
@@ -41,7 +42,9 @@ function App() {
   );
   return (
     <div className="App">
-      <RouterProvider router={router} />
+      <NotificationProvider>
+        <RouterProvider router={router} />
+      </NotificationProvider>
     </div>
   );
 }

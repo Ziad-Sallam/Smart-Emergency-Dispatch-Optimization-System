@@ -128,10 +128,17 @@ class WSActions:
                 dispatcher_id=self.user['user_id']
             )
             incident = convert_decimals(incident)
+
+            res = {
+                "action": "dispatch_incident_response",
+                "message": "Dispatch modified successfully",
+                "incident": incident
+            }
             
             # Broadcast update
-            await self._broadcast("group_ADMIN", incident, "incident_updated")
-            await self._broadcast("group_DISPATCHER", incident, "incident_updated")
+            await self._broadcast("group_ADMIN", res, "incident_updated")
+            await self._broadcast("group_DISPATCHER", res, "incident_updated")
+            await self._broadcast("group_RESPONDER", res, "incident_updated")
             
             # Notify the specific responder if vehicle is assigned
             # We need to find the responder user_id associated with this vehicle to notify them directly
@@ -140,11 +147,7 @@ class WSActions:
             # Assuming 'vehicle' key in incident has enough info or we can fetch it.
             # Ideally: await self._broadcast(f"user_{responder_id}", incident, "new_dispatch")
             
-            return {
-                "action": "dispatch_incident_response",
-                "message": "Dispatch modified successfully",
-                "incident": incident
-            }
+            return res
         except Exception as e:
             return {"action": "error", "message": str(e)}
 
@@ -379,6 +382,7 @@ class WSActions:
             # Broadcast to admins and dispatchers
             await self._broadcast("group_ADMIN", incident, "new_incident")
             await self._broadcast("group_DISPATCHER", incident, "new_incident")
+            await self._broadcast("group_RESPONDER", incident, "new_incident")
 
             # Create Notification
             create_notif = sync_to_async(repo.create_admin_notification)
@@ -509,6 +513,7 @@ class WSActions:
             get_v = sync_to_async(repo.get_vehicle_by_id)
             
             await assign(data["responder_id"], data["vehicle_id"])
+            await self.action_get_responder(data)
             
             usr = await get_u(data["responder_id"])
             if usr and 'password' in usr: usr.pop('password')
@@ -522,7 +527,6 @@ class WSActions:
             await self._broadcast("group_ADMIN", payload, "vehicle_assignment_updated")
             await self._broadcast("group_DISPATCHER", payload, "vehicle_assignment_updated")
             
-            # Notify the specific responder
             await self._broadcast(f"user_{data['responder_id']}", payload, "you_are_assigned")
 
             return {
@@ -566,3 +570,63 @@ class WSActions:
         except Exception as e:
              return {"action": "error", "message": str(e)}
 
+
+    # ============= NOTIFICATION ACTIONS =============
+
+    async def action_list_admin_notifications(self, data):
+        try:
+            if not self.user or self.user['role'] not in ['ADMIN', 'DISPATCHER']:
+                 return {"action": "error", "message": "Unauthorized"}
+            
+            get_notifs = sync_to_async(repo.get_admin_notifications)
+            notifications = await get_notifs(limit=50)
+            
+            return {
+                "action": "list_admin_notifications_response",
+                "notifications": convert_decimals(notifications)
+            }
+        except Exception as e:
+             return {"action": "error", "message": str(e)}
+
+    async def action_list_user_notifications(self, data):
+        try:
+             # Regular users (responders)
+             if not self.user:
+                  return {"action": "error", "message": "Unauthorized"}
+             
+             get_notifs = sync_to_async(repo.get_user_notifications)
+             notifications = await get_notifs(self.user['user_id'], limit=20)
+             
+             return {
+                 "action": "list_user_notifications_response",
+                 "notifications": convert_decimals(notifications)
+             }
+        except Exception as e:
+             return {"action": "error", "message": str(e)}
+
+
+    async def action_get_responder(self, data):
+        try:
+            get_u = sync_to_async(repo.get_user_by_user_id)
+            get_user_vehicle = sync_to_async(repo.get_user_vehicle)
+            get_user_incident = sync_to_async(repo.get_user_incident)
+            
+            usr = await get_u(data["responder_id"])
+            vehicle = await get_user_vehicle(data["responder_id"])
+            incident = await get_user_incident(data["responder_id"])
+            if usr and 'password' in usr: usr.pop('password')
+        
+
+            res = {
+                "action": "get_responder_response",
+                "user": convert_for_json(usr),
+                "vehicle": convert_for_json(vehicle),
+                "incident": convert_for_json(incident)
+            }
+            print(res)
+            
+            await self._broadcast(f"user_{data['responder_id']}", res, "get_responder_response")
+            
+            return res
+        except Exception as e:
+            return {"action": "error", "message": str(e)}

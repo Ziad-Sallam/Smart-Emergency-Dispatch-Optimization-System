@@ -1,16 +1,18 @@
-import React, { act, useState,useEffect } from "react";
+import React, { act, useState, useEffect } from "react";
 import "./DispatcherControls.css";
-import axios from "axios";
+import { useNotification } from "../Notificatoions/NotificationContext";
+
 
 export default function DispatcherControls({
+  ws,
   stations,
   cars,
   allIncidents,
   onAssign,
   onLocate,
   onAddIncident,
-  onAddVehicle, 
-  onAddStation, 
+  onAddVehicle,
+  onAddStation,
   pickedLocation,
   clearPickedLocation,
   isAddingCar,
@@ -20,11 +22,12 @@ export default function DispatcherControls({
   setIsAddingIncident,
   setIsAddingStation,
 }) {
+  const { showSuccess, showError } = useNotification();
   const [activeTab, setActiveTab] = useState("incidents");
   const [selectedIncidentId, setSelectedIncidentId] = useState(null);
 
   // Toggle States
-  
+
 
   // Form States
   const [incidentForm, setIncidentForm] = useState({
@@ -52,7 +55,7 @@ export default function DispatcherControls({
     return "#388e3c";
   };
 
-  
+
 
   const handleInputChange = (setter) => (e) => {
     const { name, value } = e.target;
@@ -86,119 +89,81 @@ export default function DispatcherControls({
   // --- SUBMIT HANDLERS ---
   const handleSubmitIncident = (e) => {
     e.preventDefault();
-    
 
-    axios
-      .post(
-        "http://127.0.0.1:8000/incidents/report/",
-        {
-          type: incidentForm.type,
-          severity_level: incidentForm.severity,
-          lat: parseFloat(incidentForm.lat),
-          lng: parseFloat(incidentForm.lng),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      )
-      .then((response) => {
-        console.log("Incident reported:", response.data);
-        if (onAddIncident) onAddIncident(response.data);
-        clearPickedLocation();
-        setIncidentForm({ type: "POLICE", severity: "MEDIUM", lat: "", lng: "" });
-        setIsAddingIncident(false);
-      })
-      .catch((error) => {
-        console.error("Error reporting incident:", error);
-      });
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_report_incident",
+        type: incidentForm.type,
+        severity_level: incidentForm.severity,
+        lat: parseFloat(incidentForm.lat),
+        lng: parseFloat(incidentForm.lng),
+        description: "" // Add description if needed in form
+      }));
 
-    
+      // Optimistic or wait for response? 
+      // Current pattern in plan: wait for response in Dispatcher.jsx to update list.
+      // But we should clear form here.
+      clearPickedLocation();
+      setIncidentForm({ type: "POLICE", severity: "MEDIUM", lat: "", lng: "" });
+      setIsAddingIncident(false);
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected.");
+    }
   };
 
   const handleSubmitCar = (e) => {
     e.preventDefault();
-    
 
-    axios
-      .post(
-        "http://127.0.0.1:8000/admin/vehicles/create/",
-        {
-          station_id: parseInt(carForm.stationId),
-          capacity: parseInt(carForm.capacity),
-          lat: parseFloat(carForm.lat),
-          lng: parseFloat(carForm.lng),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      )
-      .then((response) => {
-        console.log("Vehicle added:", response.data);
-        if (onAddVehicle) onAddVehicle(response.data); // Notify parent
-        clearPickedLocation();
-        setCarForm({ stationId: "", capacity: 1, lat: "", lng: "" });
-        setIsAddingCar(false);
-      })
-      .catch((error) => {
-        console.error("Error adding vehicle:", error);
-      });
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_create_vehicle",
+        station_id: parseInt(carForm.stationId),
+        capacity: parseInt(carForm.capacity),
+        lat: parseFloat(carForm.lat),
+        lng: parseFloat(carForm.lng),
+      }));
 
-    
+      clearPickedLocation();
+      setCarForm({ stationId: "", capacity: 1, lat: "", lng: "" });
+      setIsAddingCar(false);
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected.");
+    }
   };
 
   const handleSubmitStation = (e) => {
     e.preventDefault();
-    
 
-    axios
-      .post(
-        "http://127.0.0.1:8000/admin/stations/create/",
-        {
-          type: stationForm.type,
-          zone: stationForm.zone,
-          lat: parseFloat(stationForm.lat),
-          lng: parseFloat(stationForm.lng),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        }
-      )
-      .then((response) => {
-        console.log("Station added:", response.data);
-        if (onAddStation) onAddStation(response.data); // Notify parent
-        clearPickedLocation();
-        setStationForm({ type: "POLICE", zone: "", lat: "", lng: "" });
-        setIsAddingStation(false);
-      })
-      .catch((error) => {
-        console.error("Error adding station:", error);
-      });
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_create_station",
+        type: stationForm.type,
+        zone: stationForm.zone,
+        lat: parseFloat(stationForm.lat),
+        lng: parseFloat(stationForm.lng),
+      }));
 
-    
+      clearPickedLocation();
+      setStationForm({ type: "POLICE", zone: "", lat: "", lng: "" });
+      setIsAddingStation(false);
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected.");
+    }
   };
 
-  const deleteCar = async (carId) => {
-    await axios
-      .delete("http://127.0.0.1:8000/admin/vehicles/delete/", {
-        data: { vehicle_id: carId },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Vehicle deleted:", response.data);
-        // Optionally, you can notify the parent component to refresh the vehicle list
-      })
-      .catch((error) => {
-        alert("Error deleting vehicle:", error);
-      });
+  const deleteCar = (carId) => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_delete_vehicle",
+        vehicle_id: carId
+      }));
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected.");
+    }
   };
 
   // --- RENDER FUNCTIONS ---
@@ -446,8 +411,8 @@ export default function DispatcherControls({
                     type="button"
                     className="btn-cancel"
                     onClick={() => {
-                        setIsAddingIncident(false);
-                        clearPickedLocation(); // NEW: Clear pin on cancel
+                      setIsAddingIncident(false);
+                      clearPickedLocation(); // NEW: Clear pin on cancel
                     }}
                   >
                     Cancel
@@ -600,7 +565,7 @@ export default function DispatcherControls({
                         style={{
                           display: "block",
                           justifyContent: "space-between",
-                          
+
                         }}
                       >
                         <h3>{st.type}</h3>
