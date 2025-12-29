@@ -496,7 +496,7 @@ class WSActions:
 
             return {
                 "action": "pending_to_on_route_response",
-                "data": convert_for_json(response_data)
+                "data": convert_decimals(response_data)
             }
 
         except Exception as e:
