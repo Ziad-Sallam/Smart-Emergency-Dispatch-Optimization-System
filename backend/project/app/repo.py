@@ -809,6 +809,115 @@ def update_vehicles_to_on_route_by_incident(vehicle_id):
         connection.rollback()
         raise Exception(f"Failed to update vehicles: {str(e)}")
 
+# ============= NOTIFICATION MANAGEMENT =============
+
+def create_admin_notification(title, body):
+    """
+    Create a notification for admins
+    """
+    try:
+        with connection.cursor() as cursor:
+            # 1. Insert Notification
+            cursor.execute("""
+                INSERT INTO admin_notification (title, body)
+                VALUES (%s, %s)
+            """, [title, body])
+            
+            notif_id = cursor.lastrowid
+            
+            # 2. Link to all admins/dispatchers (OPTIONAL: if we want to track 'read' status per user)
+            # For now, we just create the notification record.
+            # If we need to populate admin_notification_status, we would do it here.
+            # Let's populate it for all admins/dispatchers so they can 'seen' it.
+            cursor.execute("""
+                INSERT INTO admin_notification_status (admin_id, admin_notification_id)
+                SELECT user_id, %s FROM user WHERE role IN ('ADMIN', 'DISPATCHER')
+            """, [notif_id])
+            
+            return {
+                "admin_notification_id": notif_id,
+                "title": title,
+                "body": body,
+                "created_at": datetime.now().isoformat()
+            }
+    except Exception as e:
+        raise Exception(f"Failed to create admin notification: {str(e)}")
+
+
+def get_admin_notifications(limit=50):
+    """
+    Get recent admin notifications
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT admin_notification_id, title, body, created_at
+                FROM admin_notification
+                ORDER BY created_at DESC
+                LIMIT %s
+            """, [limit])
+            
+            rows = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in rows]
+    except Exception as e:
+        raise Exception(f"Failed to fetch admin notifications: {str(e)}")
+
+def create_user_notification(incident_id, title):
+    """
+    Create a notification for users (responders) linked to an incident
+    """
+    try:
+        with connection.cursor() as cursor:
+            # 1. Insert Notification
+            cursor.execute("""
+                INSERT INTO user_notification (incident_id, title)
+                VALUES (%s, %s)
+            """, [incident_id, title])
+            
+            notif_id = cursor.lastrowid
+            
+            # 2. Link to responders assigned to this incident
+            # Find responders via dispatch -> vehicle -> responder_vehicle
+            cursor.execute("""
+                INSERT INTO user_notification_status (user_notification_id, user_id)
+                SELECT %s, rv.responder_id
+                FROM dispatch d
+                JOIN responder_vehicle rv ON d.vehicle_id = rv.vehicle_id
+                WHERE d.incident_id = %s
+            """, [notif_id, incident_id])
+            
+            return {
+                "user_notification_id": notif_id,
+                "incident_id": incident_id,
+                "title": title,
+                "created_at": datetime.now().isoformat()
+            }
+    except Exception as e:
+        raise Exception(f"Failed to create user notification: {str(e)}")
+
+def get_user_notifications(user_id, limit=20):
+    """
+    Get notifications for a specific user
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT un.user_notification_id, un.incident_id, un.title, un.created_at, uns.status
+                FROM user_notification un
+                JOIN user_notification_status uns ON un.user_notification_id = uns.user_notification_id
+                WHERE uns.user_id = %s
+                ORDER BY un.created_at DESC
+                LIMIT %s
+            """, [user_id, limit])
+            
+            rows = cursor.fetchall()
+            columns = [col[0] for col in cursor.description]
+            return [dict(zip(columns, row)) for row in rows]
+    except Exception as e:
+        raise Exception(f"Failed to fetch user notifications: {str(e)}")
+
+
 
 # ============= HELPER FUNCTIONS =============
 

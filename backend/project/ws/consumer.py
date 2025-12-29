@@ -49,8 +49,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Instantiate actions with scope to access user/auth info AND channel_layer/channel_name
         actions = WSActions(self.scope, self.channel_layer)
         
-        if hasattr(actions, action):
-            handler = getattr(actions, action)
+        # Try to find the handler with 'action_' prefix
+        method_name = f"action_{action}"
+        if hasattr(actions, method_name):
+            handler = getattr(actions, method_name)
             if asyncio.iscoroutinefunction(handler):
                 res = await handler(data)
             else:
