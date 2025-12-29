@@ -127,7 +127,7 @@ class WSActions:
                 vehicle_id=data['new_vehicle_id'],
                 dispatcher_id=self.user['user_id']
             )
-            incident = convert_decimals(incident)
+            incident = convert_for_json(incident)
 
             res = {
                 "action": "dispatch_incident_response",
