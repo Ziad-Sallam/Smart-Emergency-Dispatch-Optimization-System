@@ -16,10 +16,29 @@ const ResponderPage = () => {
 
     // States: IDLE, INCOMING, ACTIVE
     const [status, setStatus] = useState("IDLE");
+    const [vehicle, setVehicle] = useState(null);
     const [incident, setIncident] = useState(null);
 
     // WebSocket Reference
     const ws = useRef(null);
+
+    // Refs to keep track of state without triggering re-renders in WS callback
+    const responderRef = useRef(responder);
+    const incidentRef = useRef(incident);
+    const vehicleRef = useRef(vehicle);
+
+    // Update refs whenever state changes
+    useEffect(() => {
+        responderRef.current = responder;
+    }, [responder]);
+
+    useEffect(() => {
+        incidentRef.current = incident;
+    }, [incident]);
+
+    useEffect(()=>{
+      vehicleRef.current = vehicle;  
+    },[vehicle])
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
@@ -34,8 +53,11 @@ const ResponderPage = () => {
         ws.current.onopen = () => {
             console.log("Responder WS Connected");
             showInfo("Connected to Dispatch System");
-            // Optionally request current status? 
-            // ws.current.send(JSON.stringify({ action: "action_get_my_status" })); 
+            // Fetch initial status
+            ws.current.send(JSON.stringify({
+                action: "action_get_responder",
+                responder_id: localStorage.getItem("user_id")
+            }));
         };
 
         ws.current.onmessage = (event) => {
@@ -43,15 +65,64 @@ const ResponderPage = () => {
                 const data = JSON.parse(event.data);
                 console.log("WS Message:", data);
 
+                // Use refs to get latest state
+                const currentResponder = responderRef.current;
+                const currentIncident = incidentRef.current;
+
                 switch (data.action) {
+                    case "get_responder_response":
+                        if (data.vehicle[0]) {
+                            setResponder({
+                                name: data.user.name,
+                                vehicleId: data.vehicle[0].vehicle_id,
+                                type: data.vehicle[0].vehicle_type,
+                                status: data.vehicle[0].status
+                            });
+                            setVehicle({
+                                vehicle_id: data.vehicle[0].vehicle_id,
+                                vehicle_type: data.vehicle[0].vehicle_type,
+                                status: data.vehicle[0].status,
+                                lng: data.vehicle[0].vehicle_lng,
+                                lat: data.vehicle[0].vehicle_lat,
+                            })
+                        }
+
+                        if (data.incident[0]) {
+                            setIncident({
+                                incident_id: data.incident[0].incident_id,
+                                lng: data.incident[0].incident_lng,
+                                lat: data.incident[0].incident_lat,
+                                type: data.incident[0].type,
+                                status: data.incident[0].status,
+                                severity_level: data.incident[0].severity_level,
+                            });
+                        }
+                        if (data.vehicle[0].status === "AVAILABLE") {
+                            setStatus("IDLE");
+                        }
+                        if (data.vehicle[0].status === "PENDING") {
+                            setStatus("INCOMING");
+                        }
+                        if (data.vehicle[0].status === "ON_ROUTE") {
+                            setStatus("ACTIVE");
+                        }
+
+                        break;
+
                     case "you_are_assigned":
-                        // Sent when admin assigns responder to a vehicle
                         if (data.vehicle) {
                             setResponder({
-                                name: data.responder ? data.responder.name : "Responder",
+                                name: data.user ? data.user.name : (currentResponder.name || "Responder"),
                                 vehicleId: data.vehicle.vehicle_id,
                                 type: data.vehicle.vehicle_type,
                                 status: data.vehicle.status
+                            });
+                            setIncident({
+                                incident_id: data.incident[0].incident_id,
+                                lng: data.incident[0].lng,
+                                lat: data.incident[0].lat,
+                                type: data.incident[0].type,
+                                status: data.incident[0].status,
                             });
                             showSuccess(`Assigned to vehicle ${data.vehicle.vehicle_id}`);
                         }
@@ -60,23 +131,21 @@ const ResponderPage = () => {
                     case "new_incident":
                     case "incident_updated":
                         // Check if this incident is assigned to MY vehicle
-                        if (responder.vehicleId && data.vehicle_ids && data.vehicle_ids.includes(responder.vehicleId)) {
-                            // If I'm already active on this incident, just update details
-                            if (incident && incident.incident_id === data.incident_id) {
-                                setIncident(data);
-                                // If status changed?
-                            } else if (!incident || incident.incident_id !== data.incident_id) {
-                                // New assignment for me
-                                setIncident(data);
-                                setStatus("INCOMING");
-                                // If already accepted/on route, status might need to be checked from data
-                                // But 'incident_updated' usually implies dispatch logic.
-                            }
+                        if (parseInt(data.incident.vehicle_ids) === vehicleRef.current.vehicle_id) {
+                            setIncident({
+                                incident_id: data.incident.incident_id,
+                                lng: data.incident.lng,
+                                lat: data.incident.lat,
+                                type: data.incident.type,
+                                status: data.incident.status,
+                                severity_level: data.incident.severity_level,
+                            });
+                            setStatus("INCOMING");
                         }
                         break;
 
                     case "incident_resolved":
-                        if (incident && incident.incident_id === data.incident_id) {
+                        if (currentIncident && currentIncident.incident_id === data.incident_id) {
                             setIncident(null);
                             setStatus("IDLE");
                             showInfo("Incident Resolved");
@@ -118,94 +187,18 @@ const ResponderPage = () => {
         return () => {
             if (ws.current) ws.current.close();
         };
-    }, [responder.vehicleId, incident]); // Re-bind if vehicleId changes so we catch updates correctly? 
-    // Actually typically onmessage closure captures state, so refs or functional updates are safer. 
-    // But for now, simple dependency might cause reconnects. 
-    // Better to use ref for responder/incident or functional state updates.
-    // Given the complexity, let's stick to simple logic, and maybe remove dependencies if it causes reconnect loops.
-    // Moving WS init outside dependencies or empty dep array is standard, but then we need refs for state access inside onmessage.
-
-    // Using refs for state check inside callback:
-    const responderRef = useRef(responder);
-    const incidentRef = useRef(incident);
-    useEffect(() => { responderRef.current = responder; }, [responder]);
-    useEffect(() => { incidentRef.current = incident; }, [incident]);
-
-    // Re-writing the onmessage part to use refs to avoid dependency issues on useEffect
-    useEffect(() => {
-        if (!ws.current) return;
-        ws.current.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                const currentResponder = responderRef.current;
-                const currentIncident = incidentRef.current;
-
-                switch (data.action) {
-                    case "you_are_assigned":
-                        if (data.vehicle) {
-                            setResponder({
-                                name: data.responder ? data.responder.name : "Responder",
-                                vehicleId: data.vehicle.vehicle_id,
-                                type: data.vehicle.vehicle_type,
-                                status: data.vehicle.status
-                            });
-                            showSuccess(`Assigned to vehicle ${data.vehicle.vehicle_id}`);
-                        }
-                        break;
-
-                    case "new_incident":
-                    case "incident_updated":
-                        // Check against current vehicle ID
-                        if (currentResponder.vehicleId && data.vehicle_ids && data.vehicle_ids.includes(currentResponder.vehicleId)) {
-                            // If it's the same incident, update data
-                            if (currentIncident && currentIncident.incident_id === data.incident_id) {
-                                setIncident(data);
-                            } else {
-                                // New incoming
-                                setIncident(data);
-                                setStatus("INCOMING");
-                            }
-                        }
-                        break;
-
-                    case "incident_resolved":
-                        if (currentIncident && currentIncident.incident_id === data.incident_id) {
-                            setIncident(null);
-                            setStatus("IDLE");
-                            showInfo("Incident Resolved");
-                        }
-                        break;
-
-                    case "pending_to_on_route_response":
-                        if (data.data) { // response format might differ, checking generic success
-                            setStatus("ACTIVE");
-                            setResponder(prev => ({ ...prev, status: "ON_ROUTE" }));
-                            showSuccess("Status updated: En Route");
-                        }
-                        break;
-
-                    case "resolve_incident_response":
-                        setIncident(null);
-                        setStatus("IDLE");
-                        setResponder(prev => ({ ...prev, status: "AVAILABLE" }));
-                        showSuccess("Mission Completed");
-                        break;
-                    case "error":
-                        showError(data.message);
-                        break;
-                    default: break;
-                }
-            } catch (e) { console.error(e); }
-        };
-    }, [responder, incident]); // This will re-bind listener when state changes.
+    }, []); // Run ONCE on mount
 
 
     const handleAccept = () => {
+        console.log("Responder", responder);
+        console.log("Vehicle Status", vehicle);
+        console.log("Incident", incident);
         if (!incident || !responder.vehicleId) return;
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             ws.current.send(JSON.stringify({
                 action: "action_pending_to_on_route",
-                vehicle_id: parseInt(responder.vehicleId),
+                vehicle_id: responder.vehicleId,
                 incident_id: incident.incident_id
             }));
         }
@@ -271,7 +264,7 @@ const ResponderPage = () => {
                             </div>
                             <div className="detail-row">
                                 <span className="label">Location:</span>
-                                <span className="value">{incident.lat.toFixed(4)}, {incident.lng.toFixed(4)}</span>
+                                <span className="value">{incident.lat}, {incident.lng}</span>
                             </div>
                             <div className="detail-row">
                                 <span className="label">Info:</span>
@@ -290,15 +283,10 @@ const ResponderPage = () => {
                         <div className="mission-map-container">
                             <EmergencyMap
                                 stations={[]}
-                                cars={[{
-                                    vehicle_id: responder.vehicleId,
-                                    lat: incident.lat - 0.002, // Simulate vehicle slightly away
-                                    lng: incident.lng - 0.002,
-                                    vehicle_type: responder.type
-                                }]}
+                                cars={[vehicle]}
                                 allIncidents={[incident]}
                                 focusedLocation={{ lat: incident.lat, lng: incident.lng }}
-                                onMapClick={() => { }} // No interaction needed for dragging/dropping
+                                onMapClick={() => null}
                                 pickedLocation={null}
                                 isAddingCar={false}
                                 isAddingIncident={false}

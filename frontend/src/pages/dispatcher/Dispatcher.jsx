@@ -110,6 +110,7 @@ export default function Dispatcher() {
           // Broadcast events: just refresh list
           console.log("Incident update received");
           ws.current.send(JSON.stringify({ action: "action_list_incidents" }));
+          ws.current.send(JSON.stringify({ action: "action_list_vehicles" }));
           break;
         case "vehicle_created":
         case "vehicle_deleted":
