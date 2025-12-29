@@ -4,6 +4,7 @@ from channels.layers import get_channel_layer
 
 from .route_streamer import stream_vehicle_route
 from .vehicle_state import get_last_location, get_users_for_vehicle
+from .map_routing import get_route
 
 channel_layer = get_channel_layer()
 
@@ -44,4 +45,5 @@ async def dispatch_vehicle_to_destination(vehicle_id, end_lng, end_lat, start_ln
     )
 
     VEHICLE_TASKS[vehicle_id] = task
+    return get_route(start, end)
 

@@ -17,7 +17,6 @@ channel_layer = get_channel_layer()
 async def stream_vehicle_route(vehicle_id, user_ids, start, end, interval=5):
     try:
         route_points = await sync_to_async(get_route)(start, end)
-        print(f"[stream] Vehicle {vehicle_id} route points:", route_points)
 
         for lng, lat in route_points:
             payload = {
