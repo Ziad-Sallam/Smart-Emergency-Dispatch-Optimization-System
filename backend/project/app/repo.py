@@ -250,6 +250,7 @@ def get_vehicle_by_id(vehicle_id):
                 FROM vehicle v
                 JOIN station s ON v.station_id = s.station_id
                 LEFT JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
+                
                 WHERE v.vehicle_id = %s
                 GROUP BY v.vehicle_id
             """,
@@ -1008,19 +1009,17 @@ SELECT
     v.status,
     v.capacity,
     v.station_id,
+    s.zone,
+    s.type as vehicle_type,
     ST_Y(v.location) AS vehicle_lat,
     ST_X(v.location) AS vehicle_lng,
+    COUNT(rv.responder_id) as responder_count
 
-    u.user_id,
-    u.name,
-    u.email,
-    u.role
-
-FROM vehicle v
-JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
-JOIN `user` u ON rv.responder_id = u.user_id
-WHERE u.user_id = %s;
-
+    FROM vehicle v
+    JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
+    JOIN `user` u ON rv.responder_id = u.user_id
+    JOIN station s ON v.station_id = s.station_id
+    WHERE u.user_id = %s;
 
             """,
                 (user_id,),
