@@ -104,6 +104,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "sender": sender_info
         }
 
+    async def vehicle_update(self, event):
+        pass
+
     async def broadcast_message(self, event):
         """
         Handler for messages broadcast to groups (e.g. from ws_actions).
