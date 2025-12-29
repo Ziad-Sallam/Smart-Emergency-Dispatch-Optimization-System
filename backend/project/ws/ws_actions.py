@@ -79,7 +79,7 @@ class WSActions:
             analytics["worst_station"] = await get_worst_stn()
             analytics["total_incidents_type"] = await get_incidents()
             analytics["active_vehicles_type"] = await get_vehicles()
-            analytics = convert_decimals(analytics)
+            analytics = convert_for_json(analytics)
             print(analytics)
 
             return {"action": "analytics_received", "analytics": analytics}
@@ -100,7 +100,6 @@ class WSActions:
             get_incidents = sync_to_async(repo.get_all_incidents)
             incidents = await get_incidents(status)
             print(incidents)
-            incidents = convert_decimals(incidents)
             incidents = convert_for_json(incidents)
             
             return {
@@ -160,7 +159,7 @@ class WSActions:
             
             get_dispatches = sync_to_async(repo.get_dispatch_by_incident)
             dispatches = await get_dispatches(incident_id)
-            dispatches = convert_decimals(dispatches)
+            dispatches = convert_for_json(dispatches)
             
             return {
                 "action": "get_incident_dispatches_response",
@@ -182,7 +181,7 @@ class WSActions:
             
             get_vehicles = sync_to_async(repo.get_all_vehicles)
             vehicles = await get_vehicles(status)
-            vehicles = convert_decimals(vehicles)
+            vehicles = convert_for_json(vehicles)
             
             return {
                 "action": "list_vehicles_response",
@@ -209,7 +208,7 @@ class WSActions:
                 lat=data['lat'],
                 lng=data['lng']
             )
-            vehicle = convert_decimals(vehicle)
+            vehicle = convert_for_json(vehicle)
             
             await self._broadcast("group_ADMIN", vehicle, "vehicle_created")
             await self._broadcast("group_DISPATCHER", vehicle, "vehicle_created")
@@ -253,7 +252,7 @@ class WSActions:
             
             get_stations = sync_to_async(repo.get_all_stations)
             stations = await get_stations()
-            stations = convert_decimals(stations)
+            stations = convert_for_json(stations)
             
             return {
                 "action": "list_stations_response",
@@ -284,7 +283,7 @@ class WSActions:
                 lat=data['lat'],
                 lng=data['lng']
             )
-            station = convert_decimals(station)
+            station = convert_for_json(station)
             
             await self._broadcast("group_ADMIN", station, "station_created")
             
@@ -305,7 +304,7 @@ class WSActions:
             
             get_admins = sync_to_async(repo.get_all_admin_users)
             admins = await get_admins()
-            admins = convert_decimals(admins)
+            admins = convert_for_json(admins)
             
             return {
                 "action": "list_admins_response",
@@ -377,7 +376,7 @@ class WSActions:
                 severity=data['severity_level'].upper(),
                 description=data.get('description', '')
             )
-            incident = convert_decimals(incident)
+            incident = convert_for_json(incident)
             
             # Broadcast to admins and dispatchers
             await self._broadcast("group_ADMIN", incident, "new_incident")
@@ -415,7 +414,7 @@ class WSActions:
                 lat=data['lat'],
                 lng=data['lng']
             )
-            vehicle = convert_decimals(vehicle)
+            vehicle = convert_for_json(vehicle)
             
             # Broadcast location update
             payload = {
@@ -442,7 +441,7 @@ class WSActions:
             
             resolve = sync_to_async(repo.resolve_incident)
             incident = await resolve(data['incident_id'])
-            incident = convert_decimals(incident)
+            incident = convert_for_json(incident)
             
             await self._broadcast("group_ADMIN", incident, "incident_resolved")
             await self._broadcast("group_DISPATCHER", incident, "incident_resolved")
@@ -497,7 +496,7 @@ class WSActions:
 
             return {
                 "action": "pending_to_on_route_response",
-                "data": convert_decimals(response_data)
+                "data": convert_for_json(response_data)
             }
 
         except Exception as e:
@@ -521,8 +520,8 @@ class WSActions:
             vehicle = await get_v(data["vehicle_id"]) 
             
             payload = {
-                "responder": convert_decimals(usr),
-                "vehicle": convert_decimals(vehicle)
+                "responder": convert_for_json(usr),
+                "vehicle": convert_for_json(vehicle)
             }
             await self._broadcast("group_ADMIN", payload, "vehicle_assignment_updated")
             await self._broadcast("group_DISPATCHER", payload, "vehicle_assignment_updated")
@@ -531,8 +530,8 @@ class WSActions:
 
             return {
                 "action": "assign_responder_to_vehicle_response",
-                "user": convert_decimals(usr),
-                "vehicle": convert_decimals(vehicle)
+                "user": convert_for_json(usr),
+                "vehicle": convert_for_json(vehicle)
             }
         except Exception as e:
             return {"action": "error", "message": str(e)}
@@ -549,7 +548,7 @@ class WSActions:
             
             return {
                 "action": "list_admin_notifications_response",
-                "notifications": convert_decimals(notifications)
+                "notifications": convert_for_json(notifications)
             }
         except Exception as e:
              return {"action": "error", "message": str(e)}
@@ -565,7 +564,7 @@ class WSActions:
              
              return {
                  "action": "list_user_notifications_response",
-                 "notifications": convert_decimals(notifications)
+                 "notifications": convert_for_json(notifications)
              }
         except Exception as e:
              return {"action": "error", "message": str(e)}
@@ -583,7 +582,7 @@ class WSActions:
             
             return {
                 "action": "list_admin_notifications_response",
-                "notifications": convert_decimals(notifications)
+                "notifications": convert_for_json(notifications)
             }
         except Exception as e:
              return {"action": "error", "message": str(e)}
@@ -599,7 +598,7 @@ class WSActions:
              
              return {
                  "action": "list_user_notifications_response",
-                 "notifications": convert_decimals(notifications)
+                 "notifications": convert_for_json(notifications)
              }
         except Exception as e:
              return {"action": "error", "message": str(e)}

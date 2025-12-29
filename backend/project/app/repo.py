@@ -1054,12 +1054,12 @@ SELECT
     ST_Y(v.location) AS vehicle_lat,
     ST_X(v.location) AS vehicle_lng
 
-FROM incident i
-JOIN dispatch d ON i.incident_id = d.incident_id
-JOIN vehicle v ON d.vehicle_id = v.vehicle_id
-JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
-JOIN `user` u ON rv.responder_id = u.user_id
-WHERE u.user_id = %s;
+    FROM incident i
+    JOIN dispatch d ON i.incident_id = d.incident_id
+    JOIN vehicle v ON d.vehicle_id = v.vehicle_id
+    JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
+    JOIN `user` u ON rv.responder_id = u.user_id
+    WHERE u.user_id = %s and i.status != 'resolved';
 
             """,
                 (user_id,),
