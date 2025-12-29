@@ -21,6 +21,7 @@ const ResponderPage = () => {
 
     // WebSocket Reference
     const ws = useRef(null);
+    const vehicleWs = useRef(null);
 
     // Refs to keep track of state without triggering re-renders in WS callback
     const responderRef = useRef(responder);
@@ -36,9 +37,9 @@ const ResponderPage = () => {
         incidentRef.current = incident;
     }, [incident]);
 
-    useEffect(()=>{
-      vehicleRef.current = vehicle;  
-    },[vehicle])
+    useEffect(() => {
+        vehicleRef.current = vehicle;
+    }, [vehicle])
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
@@ -189,6 +190,53 @@ const ResponderPage = () => {
         };
     }, []); // Run ONCE on mount
 
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            showError("No access token found. Please login.");
+            return;
+        }
+
+        if (!vehicle || !vehicle.vehicle_id) return;
+
+        const wsUrl = `ws://127.0.0.1:8000/ws/fleet/?token=${token}`;
+        vehicleWs.current = new WebSocket(wsUrl);
+
+        vehicleWs.current.onopen = () => {
+            console.log("Vehicle WS Connected");
+            vehicleWs.current.send(JSON.stringify({
+                action: "subscribe_vehicle",
+                vehicle_id: vehicle.vehicle_id
+            }));
+        };
+
+        vehicleWs.current.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log("Vehicle WS Message", data);
+                if (data.action === "vehicle_location_update") {
+                    if (data.vehicle_id === vehicle.vehicle_id) {
+                        setVehicle(prev => ({
+                            ...prev,
+                            lng: data.lng,
+                            lat: data.lat,
+                        }));
+                    }
+                }
+            } catch (err) {
+                console.error("WS Parse Error", err);
+            }
+        };
+
+        vehicleWs.current.onclose = () => {
+            console.log("Vehicle WS Disconnected");
+        };
+
+        return () => {
+            if (vehicleWs.current) vehicleWs.current.close();
+        };
+    }, [vehicle?.vehicle_id]);
+
 
     const handleAccept = () => {
         console.log("Responder", responder);
@@ -200,6 +248,14 @@ const ResponderPage = () => {
                 action: "action_pending_to_on_route",
                 vehicle_id: responder.vehicleId,
                 incident_id: incident.incident_id
+            }));
+            ws.current.send(JSON.stringify({
+                action: "action_dispatch_vehicle",
+                vehicle_id: responder.vehicleId,
+                start_lng: vehicle.lng,
+                start_lat: vehicle.lat,
+                end_lng: incident.lng,
+                end_lat: incident.lat,
             }));
         }
     };
@@ -285,7 +341,7 @@ const ResponderPage = () => {
                                 stations={[]}
                                 cars={[vehicle]}
                                 allIncidents={[incident]}
-                                focusedLocation={{ lat: incident.lat, lng: incident.lng }}
+                                focusedLocation={null}
                                 onMapClick={() => null}
                                 pickedLocation={null}
                                 isAddingCar={false}
