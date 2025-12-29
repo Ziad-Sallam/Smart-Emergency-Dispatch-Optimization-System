@@ -30,6 +30,8 @@ const LogIn = () => {
       });
       if (response.data) {
        console.log("Login successful:", response.data);
+       localStorage.setItem("user_id", response.data.user.user_id);
+       localStorage.setItem("user_role", response.data.user.user_role);
        localStorage.setItem("access_token", response.data.access_token);
        localStorage.setItem("refresh_token", response.data.refresh_token);
        navigate("/map");

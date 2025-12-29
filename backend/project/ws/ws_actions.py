@@ -489,7 +489,7 @@ class WSActions:
             # response uses incident_id
             response_data = {}
             if "incident_id" in data:
-                 veh = await get_veh(data["incident_id"]) 
+                 veh = await get_veh(vehicle_id) 
                  response_data = veh
             
             await self._broadcast("group_ADMIN", {"vehicle_id": vehicle_id, "status": "ON_ROUTE"}, "vehicle_status_updated")
