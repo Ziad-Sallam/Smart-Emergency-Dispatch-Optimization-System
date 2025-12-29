@@ -3,6 +3,7 @@ from app import repo
 from decimal import Decimal
 from app.hasher import hash_password
 from datetime import datetime 
+from .dispatch import dispatch_vehicle_to_destination
 # Assuming hash_password is in app.hasher based on views.py imports
 
 def convert_decimals(obj):
@@ -627,5 +628,16 @@ class WSActions:
             await self._broadcast(f"user_{data['responder_id']}", res, "get_responder_response")
             
             return res
+        except Exception as e:
+            return {"action": "error", "message": str(e)}
+    
+    async def action_dispatch_vehicle(self, data):
+        try:
+            if not self.user or self.user['role'] != 'ADMIN':
+                return {"action": "error", "message": "Unauthorized - Admin only"}
+            
+            await dispatch_vehicle_to_destination(data["vehicle_id"], data["end_lng"], data["end_lat"], data["start_lng"] if data["start_lng"] else None, data["start_lat"] if data["start_lat"] else None)
+            
+            return {"action": "dispatch_vehicle_response"}
         except Exception as e:
             return {"action": "error", "message": str(e)}

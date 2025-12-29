@@ -9,7 +9,4 @@ def get_route(start, end):
 
     response = requests.get(url)
     data = response.json()
-
-    route_points = data['routes'][0]['geometry']['coordinates']
-    return route_points
-    
+    return data['routes'][0]['geometry']['coordinates']
