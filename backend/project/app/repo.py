@@ -889,6 +889,78 @@ def update_vehicles_to_on_route_by_incident(vehicle_id):
         raise Exception(f"Failed to update vehicles: {str(e)}")
 
 
+def get_user_vehicle(user_id):
+    try:
+        with connection.cursor() as crs:
+            crs.execute(
+                """
+SELECT
+    v.vehicle_id,
+    v.status,
+    v.capacity,
+    v.station_id,
+    ST_Y(v.location) AS vehicle_lat,
+    ST_X(v.location) AS vehicle_lng,
+
+    u.user_id,
+    u.name,
+    u.email,
+    u.role
+
+FROM vehicle v
+JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
+JOIN `user` u ON rv.responder_id = u.user_id
+WHERE u.user_id = %s;
+
+
+            """,
+                (user_id,),
+            )
+            rows = crs.fetchall()
+            return [dict(zip([col[0] for col in crs.description], row)) for row in rows]
+    except Exception as e:
+        raise Exception(f"Failed to get user vehicle: {str(e)}")
+
+
+def get_user_incident(user_id):
+    try:
+        with connection.cursor() as crs:
+            crs.execute(
+                """
+SELECT
+    i.incident_id,
+    i.time_reported,
+    i.time_resolved,
+    i.type,
+    i.status AS incident_status,
+    i.severity_level,
+    ST_Y(i.location) AS incident_lat,
+    ST_X(i.location) AS incident_lng,
+
+    d.dispatch_id,
+
+    v.vehicle_id,
+    v.status AS vehicle_status,
+    v.capacity,
+    v.station_id,
+    ST_Y(v.location) AS vehicle_lat,
+    ST_X(v.location) AS vehicle_lng
+
+FROM incident i
+JOIN dispatch d ON i.incident_id = d.incident_id
+JOIN vehicle v ON d.vehicle_id = v.vehicle_id
+JOIN responder_vehicle rv ON v.vehicle_id = rv.vehicle_id
+JOIN `user` u ON rv.responder_id = u.user_id
+WHERE u.user_id = %s;
+
+            """,
+                (user_id,),
+            )
+            rows = crs.fetchall()
+            return [dict(zip([col[0] for col in crs.description], row)) for row in rows]
+    except Exception as e:
+        raise Exception(f"Failed to get user incident: {str(e)}")
+
 # ============= HELPER FUNCTIONS =============
 
 
@@ -926,3 +998,4 @@ def zip_user(row, description):
     columns = [col[0] for col in description]
     user = dict(zip(columns, row))
     return user
+
