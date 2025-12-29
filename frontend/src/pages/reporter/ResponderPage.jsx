@@ -1,44 +1,224 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import EmergencyMap from '../../components/map/EmergencyMap';
 import './ResponderPage.css';
+import { useNotification } from '../../components/Notificatoions/NotificationContext';
 
 const ResponderPage = () => {
-    // Mock Responder Data
-    const [responder] = useState({
-        name: "Ahmed Hassan",
-        vehicleId: "MED-01",
-        type: "MEDICAL",
-        status: "AVAILABLE"
+    const { showSuccess, showError, showInfo } = useNotification();
+
+    // Responder State - ideally fetched from backend or assigned via WS
+    const [responder, setResponder] = useState({
+        name: "Waiting for assignment...",
+        vehicleId: null,
+        type: "UNKNOWN",
+        status: "UNKNOWN"
     });
 
     // States: IDLE, INCOMING, ACTIVE
     const [status, setStatus] = useState("IDLE");
     const [incident, setIncident] = useState(null);
 
-    // Mock Incident Data for simulation
-    const mockIncident = {
-        incident_id: 101,
-        type: "MEDICAL",
-        severity_level: "CRITICAL",
-        lat: 31.2252407,
-        lng: 29.9467916, // Near the central command in existing data
-        description: "Cardiac arrest reported at Alexandria Station.",
-        time_reported: new Date().toISOString()
-    };
+    // WebSocket Reference
+    const ws = useRef(null);
 
-    const handleSimulateIncoming = () => {
-        setIncident(mockIncident);
-        setStatus("INCOMING");
-    };
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+            showError("No access token found. Please login.");
+            return;
+        }
+
+        const wsUrl = `ws://127.0.0.1:8000/ws/chat/?token=${token}`;
+        ws.current = new WebSocket(wsUrl);
+
+        ws.current.onopen = () => {
+            console.log("Responder WS Connected");
+            showInfo("Connected to Dispatch System");
+            // Optionally request current status? 
+            // ws.current.send(JSON.stringify({ action: "action_get_my_status" })); 
+        };
+
+        ws.current.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log("WS Message:", data);
+
+                switch (data.action) {
+                    case "you_are_assigned":
+                        // Sent when admin assigns responder to a vehicle
+                        if (data.vehicle) {
+                            setResponder({
+                                name: data.responder ? data.responder.name : "Responder",
+                                vehicleId: data.vehicle.vehicle_id,
+                                type: data.vehicle.vehicle_type,
+                                status: data.vehicle.status
+                            });
+                            showSuccess(`Assigned to vehicle ${data.vehicle.vehicle_id}`);
+                        }
+                        break;
+
+                    case "new_incident":
+                    case "incident_updated":
+                        // Check if this incident is assigned to MY vehicle
+                        if (responder.vehicleId && data.vehicle_ids && data.vehicle_ids.includes(responder.vehicleId)) {
+                            // If I'm already active on this incident, just update details
+                            if (incident && incident.incident_id === data.incident_id) {
+                                setIncident(data);
+                                // If status changed?
+                            } else if (!incident || incident.incident_id !== data.incident_id) {
+                                // New assignment for me
+                                setIncident(data);
+                                setStatus("INCOMING");
+                                // If already accepted/on route, status might need to be checked from data
+                                // But 'incident_updated' usually implies dispatch logic.
+                            }
+                        }
+                        break;
+
+                    case "incident_resolved":
+                        if (incident && incident.incident_id === data.incident_id) {
+                            setIncident(null);
+                            setStatus("IDLE");
+                            showInfo("Incident Resolved");
+                        }
+                        break;
+
+                    case "pending_to_on_route_response":
+                        if (data.data && data.data.status === "ON_ROUTE") {
+                            setStatus("ACTIVE");
+                            setResponder(prev => ({ ...prev, status: "ON_ROUTE" }));
+                            showSuccess("Status updated: En Route");
+                        }
+                        break;
+
+                    case "resolve_incident_response":
+                        setIncident(null);
+                        setStatus("IDLE");
+                        setResponder(prev => ({ ...prev, status: "AVAILABLE" }));
+                        showSuccess("Mission Completed");
+                        break;
+
+                    case "error":
+                        showError(data.message);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            } catch (err) {
+                console.error("WS Parse Error", err);
+            }
+        };
+
+        ws.current.onclose = () => {
+            console.log("Responder WS Disconnected");
+        };
+
+        return () => {
+            if (ws.current) ws.current.close();
+        };
+    }, [responder.vehicleId, incident]); // Re-bind if vehicleId changes so we catch updates correctly? 
+    // Actually typically onmessage closure captures state, so refs or functional updates are safer. 
+    // But for now, simple dependency might cause reconnects. 
+    // Better to use ref for responder/incident or functional state updates.
+    // Given the complexity, let's stick to simple logic, and maybe remove dependencies if it causes reconnect loops.
+    // Moving WS init outside dependencies or empty dep array is standard, but then we need refs for state access inside onmessage.
+
+    // Using refs for state check inside callback:
+    const responderRef = useRef(responder);
+    const incidentRef = useRef(incident);
+    useEffect(() => { responderRef.current = responder; }, [responder]);
+    useEffect(() => { incidentRef.current = incident; }, [incident]);
+
+    // Re-writing the onmessage part to use refs to avoid dependency issues on useEffect
+    useEffect(() => {
+        if (!ws.current) return;
+        ws.current.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                const currentResponder = responderRef.current;
+                const currentIncident = incidentRef.current;
+
+                switch (data.action) {
+                    case "you_are_assigned":
+                        if (data.vehicle) {
+                            setResponder({
+                                name: data.responder ? data.responder.name : "Responder",
+                                vehicleId: data.vehicle.vehicle_id,
+                                type: data.vehicle.vehicle_type,
+                                status: data.vehicle.status
+                            });
+                            showSuccess(`Assigned to vehicle ${data.vehicle.vehicle_id}`);
+                        }
+                        break;
+
+                    case "new_incident":
+                    case "incident_updated":
+                        // Check against current vehicle ID
+                        if (currentResponder.vehicleId && data.vehicle_ids && data.vehicle_ids.includes(currentResponder.vehicleId)) {
+                            // If it's the same incident, update data
+                            if (currentIncident && currentIncident.incident_id === data.incident_id) {
+                                setIncident(data);
+                            } else {
+                                // New incoming
+                                setIncident(data);
+                                setStatus("INCOMING");
+                            }
+                        }
+                        break;
+
+                    case "incident_resolved":
+                        if (currentIncident && currentIncident.incident_id === data.incident_id) {
+                            setIncident(null);
+                            setStatus("IDLE");
+                            showInfo("Incident Resolved");
+                        }
+                        break;
+
+                    case "pending_to_on_route_response":
+                        if (data.data) { // response format might differ, checking generic success
+                            setStatus("ACTIVE");
+                            setResponder(prev => ({ ...prev, status: "ON_ROUTE" }));
+                            showSuccess("Status updated: En Route");
+                        }
+                        break;
+
+                    case "resolve_incident_response":
+                        setIncident(null);
+                        setStatus("IDLE");
+                        setResponder(prev => ({ ...prev, status: "AVAILABLE" }));
+                        showSuccess("Mission Completed");
+                        break;
+                    case "error":
+                        showError(data.message);
+                        break;
+                    default: break;
+                }
+            } catch (e) { console.error(e); }
+        };
+    }, [responder, incident]); // This will re-bind listener when state changes.
+
 
     const handleAccept = () => {
-        setStatus("ACTIVE");
+        if (!incident || !responder.vehicleId) return;
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+                action: "action_pending_to_on_route",
+                vehicle_id: parseInt(responder.vehicleId),
+                incident_id: incident.incident_id
+            }));
+        }
     };
 
     const handleResolve = () => {
-        setStatus("IDLE");
-        setIncident(null);
-        alert("Incident Resolved! Good work.");
+        if (!incident) return;
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+                action: "action_resolve_incident",
+                incident_id: incident.incident_id
+            }));
+        }
     };
 
     // Helper to get formatted status for UI
@@ -56,7 +236,7 @@ const ResponderPage = () => {
             <div className="responder-header">
                 <div>
                     <h2 className="responder-name">{responder.name}</h2>
-                    <p className="vehicle-info">Vehicle: <strong>{responder.vehicleId}</strong> ({responder.type})</p>
+                    <p className="vehicle-info">Vehicle: <strong>{responder.vehicleId || "None"}</strong> ({responder.type})</p>
                 </div>
                 <div>
                     {getStatusBadge()}
@@ -69,12 +249,7 @@ const ResponderPage = () => {
                     <div className="idle-view">
                         <div className="pulse-circle"></div>
                         <h3>Scanning for incidents...</h3>
-                        <p>You are currently available.</p>
-
-                        {/* Dev Tool for Simulation */}
-                        <button onClick={handleSimulateIncoming} className="simulate-btn">
-                            [DEV] Simulate Incoming Incident
-                        </button>
+                        <p>{responder.vehicleId ? "You are currently available." : "Waiting for vehicle assignment..."}</p>
                     </div>
                 )}
 

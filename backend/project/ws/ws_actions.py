@@ -132,6 +132,7 @@ class WSActions:
             # Broadcast update
             await self._broadcast("group_ADMIN", incident, "incident_updated")
             await self._broadcast("group_DISPATCHER", incident, "incident_updated")
+            await self._broadcast("group_RESPONDER", incident, "incident_updated")
             
             # Notify the specific responder if vehicle is assigned
             # We need to find the responder user_id associated with this vehicle to notify them directly
@@ -379,6 +380,7 @@ class WSActions:
             # Broadcast to admins and dispatchers
             await self._broadcast("group_ADMIN", incident, "new_incident")
             await self._broadcast("group_DISPATCHER", incident, "new_incident")
+            await self._broadcast("group_RESPONDER", incident, "new_incident")
             
             return {
                 "action": "report_incident_response",
