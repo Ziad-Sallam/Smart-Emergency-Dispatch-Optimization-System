@@ -42,7 +42,7 @@ export default function EmergencyMap({
   stations,
   cars,
   allIncidents,
-  route,
+  routes,
   focusedLocation,
   onMapClick,
   pickedLocation,
@@ -50,7 +50,7 @@ export default function EmergencyMap({
   isAddingIncident,
   isAddingStation,
   showPanel,
-}){
+}) {
 
   // 1. CREATE A REF FOR THE MAP
   const mapRef = useRef(null);
@@ -223,14 +223,18 @@ export default function EmergencyMap({
               {car.vehicle_type === "MEDICAL"
                 ? "🚑"
                 : car.vehicle_type === "FIRE"
-                ? "🚒"
-                : "🚓"}
+                  ? "🚒"
+                  : "🚓"}
             </div>
           </Marker>
         ))}
 
         {/* Route */}
-        <Source id="route" type="geojson" data={route}>
+        {routes.map((route) => <Source
+          id="route"
+          type="geojson"
+          data={route || { type: 'FeatureCollection', features: [] }}
+        >
           <Layer
             id="route-line"
             type="line"
@@ -240,7 +244,7 @@ export default function EmergencyMap({
               "line-opacity": 0.7,
             }}
           />
-        </Source>
+        </Source>)}
 
         {/* Popup */}
         {selectedItem && (

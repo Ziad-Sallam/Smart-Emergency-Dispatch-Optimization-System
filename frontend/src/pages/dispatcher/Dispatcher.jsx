@@ -47,6 +47,7 @@ export default function Dispatcher() {
 
   // WebSocket Reference
   const ws = React.useRef(null);
+  const VehicleWS = React.useRef(null);
 
   useEffect(() => {
     // 1. Establish WebSocket Connection
@@ -144,6 +145,47 @@ export default function Dispatcher() {
     };
   }, []);
 
+  useEffect(() => {
+    // 1. Establish WebSocket Connection
+    const token = localStorage.getItem("access_token");
+    const wsUrl = `ws://127.0.0.1:8000/ws/fleet/?token=${token}`;
+
+    VehicleWS.current = new WebSocket(wsUrl);
+
+    VehicleWS.current.onopen = () => {
+      console.log("Vehicle WebSocket Connected");
+    };
+
+    VehicleWS.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log("WS Message:", data);
+
+      switch (data.action) {
+        case "vehicle_location_updated":
+          setCars((prevCars) =>
+            prevCars.map((car) =>
+              car.id === data.vehicle_id ? { ...car, lat:data.lat, lng:data.lng } : car
+            )
+          );
+          break;
+        case "error":
+          console.error("WS Error:", data.message);
+          showError("Error: " + data.message);
+          break;
+        default:
+          break;
+      }
+    };
+
+    VehicleWS.current.onclose = () => {
+      console.log("vehicle WebSocket Disconnected");
+    };
+
+    return () => {
+      if (VehicleWS.current) VehicleWS.current.close();
+    };
+  }, []);
+
 
   return (
     <div className="dispatcher-layout" style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -172,6 +214,7 @@ export default function Dispatcher() {
           cars={cars}
           allIncidents={incidents}
           focusedLocation={focusedLocation}
+          routes={[]}
           onMapClick={handleMapClick}
           pickedLocation={pickedLocation}
           isAddingCar={isAddingCar}

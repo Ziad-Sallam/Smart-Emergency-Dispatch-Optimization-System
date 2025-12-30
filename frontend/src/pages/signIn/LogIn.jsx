@@ -29,12 +29,16 @@ const LogIn = () => {
         password: password,
       });
       if (response.data) {
-       console.log("Login successful:", response.data);
-       localStorage.setItem("user_id", response.data.user.user_id);
-       localStorage.setItem("user_role", response.data.user.user_role);
-       localStorage.setItem("access_token", response.data.access_token);
-       localStorage.setItem("refresh_token", response.data.refresh_token);
-       navigate("/map");
+        console.log("Login successful:", response.data);
+        localStorage.setItem("user_id", response.data.user.user_id);
+        localStorage.setItem("user_role", response.data.user.role);
+        localStorage.setItem("access_token", response.data.access_token);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        if (response.data.user.role === "ADMIN") {
+          navigate("/map");
+        } else if (response.data.user.role === "RESPONDER") {
+          navigate("/responder");
+        }
       }
     } catch (err) {
       console.error("Login failed:", err);
@@ -43,7 +47,7 @@ const LogIn = () => {
       setLoading(false);
     }
 
-  
+
   };
 
   return (
@@ -101,7 +105,7 @@ const LogIn = () => {
               </button>
 
               {error && <div className="error-msg">{error}</div>}
-              
+
             </form>
           </div>
         </div>

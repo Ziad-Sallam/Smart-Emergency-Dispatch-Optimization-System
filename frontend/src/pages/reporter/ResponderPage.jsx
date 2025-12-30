@@ -18,6 +18,7 @@ const ResponderPage = () => {
     const [status, setStatus] = useState("IDLE");
     const [vehicle, setVehicle] = useState(null);
     const [incident, setIncident] = useState(null);
+    const [route, setRoute] = useState(null);
 
     // WebSocket Reference
     const ws = useRef(null);
@@ -149,6 +150,7 @@ const ResponderPage = () => {
                         if (currentIncident && currentIncident.incident_id === data.incident_id) {
                             setIncident(null);
                             setStatus("IDLE");
+                            setRoute(null);
                             showInfo("Incident Resolved");
                         }
                         break;
@@ -161,9 +163,28 @@ const ResponderPage = () => {
                         }
                         break;
 
+                    case "dispatch_vehicle_response":
+                        if (data.route) {
+                            const geoJsonRoute = {
+                                type: "FeatureCollection",
+                                features: [{
+                                    type: "Feature",
+                                    properties: {},
+                                    geometry: {
+                                        type: "LineString",
+                                        coordinates: data.route
+                                    }
+                                }]
+                            };
+                            setRoute(geoJsonRoute);
+                            console.log("Route received:", geoJsonRoute);
+                        }
+                        break;
+
                     case "resolve_incident_response":
                         setIncident(null);
                         setStatus("IDLE");
+                        setRoute(null);
                         setResponder(prev => ({ ...prev, status: "AVAILABLE" }));
                         showSuccess("Mission Completed");
                         break;
@@ -341,6 +362,7 @@ const ResponderPage = () => {
                                 stations={[]}
                                 cars={[vehicle]}
                                 allIncidents={[incident]}
+                                routes={[route]}
                                 focusedLocation={null}
                                 onMapClick={() => null}
                                 pickedLocation={null}

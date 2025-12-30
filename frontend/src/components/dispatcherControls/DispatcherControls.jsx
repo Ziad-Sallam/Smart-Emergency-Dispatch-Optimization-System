@@ -167,6 +167,18 @@ export default function DispatcherControls({
     }
   };
 
+  const trackCar = (carId) => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_track_vehicle",
+        vehicle_id: carId
+      }));
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected.");
+    }
+  };
+
   // --- RENDER FUNCTIONS ---
 
   return (
@@ -282,6 +294,7 @@ export default function DispatcherControls({
                       <h4>{inc.type.toUpperCase()}</h4>
                       <p className="card-desc">Region: {inc.station_zones}</p>
                       <p className="card-desc">Reported Time: {inc.time_reported}</p>
+                      <p className="card-desc">Dispatched units: {inc.vehicle_ids}</p>
 
                       <div className="card-footer">
                         <span
@@ -308,6 +321,7 @@ export default function DispatcherControls({
                                   </option>
                                   {cars
                                     .filter((c) => c.status === "AVAILABLE")
+                                    .filter((c) => c.vehicle_type === inc.type)
                                     .map((c) => (
                                       <option
                                         key={c.vehicle_id}
@@ -460,6 +474,15 @@ export default function DispatcherControls({
                               }}
                             >
                               DELETE
+                            </button>
+                            <button
+                              className="track-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                trackCar(car.vehicle_id);
+                              }}
+                            >
+                              Track
                             </button>
                           </div>
                           <h4>{car.vehicle_type}</h4>
