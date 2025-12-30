@@ -699,8 +699,63 @@ def ass_responder_to_vehicle(request):
         data = json.loads(request.body)
         assign_responder_to_vehicle(data["responder_id"], data["vehicle_id"])
         usr = get_user_by_user_id(data["responder_id"])
-        vechile = get_vehicle_by_id(data["vehicle_id"])
-        return JsonResponse({"user": usr, "vechile": vechile}, status=200)
+        vehicle = get_vehicle_by_id(data["vehicle_id"])
+
+        # Broadcast via WebSocket
+        try:
+            from channels.layers import get_channel_layer
+            from asgiref.sync import async_to_sync
+            from ws.ws_actions import convert_decimals, convert_for_json
+
+            channel_layer = get_channel_layer()
+
+            # Prepare payload
+            payload = {
+                "user": convert_for_json(usr),
+                "vehicle": convert_for_json(vehicle)
+            }
+
+            # Broadcast to Admins and Dispatchers
+            async_to_sync(channel_layer.group_send)(
+                "group_ADMIN",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "vehicle_assignment_updated",
+                        "user": payload["user"],
+                        "vehicle": payload["vehicle"]
+                    }
+                }
+            )
+            async_to_sync(channel_layer.group_send)(
+                "group_DISPATCHER",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "vehicle_assignment_updated",
+                        "user": payload["user"],
+                        "vehicle": payload["vehicle"]
+                    }
+                }
+            )
+
+            # Broadcast to specific Responder
+            async_to_sync(channel_layer.group_send)(
+                f"user_{data['responder_id']}",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "you_are_assigned",
+                        "user": payload["user"],
+                        "vehicle": payload["vehicle"]
+                    }
+                }
+            )
+
+        except Exception as ws_error:
+            print(f"WebSocket trigger failed: {str(ws_error)}")
+
+        return JsonResponse({"user": usr, "vechile": vehicle}, status=200)
 
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=500)

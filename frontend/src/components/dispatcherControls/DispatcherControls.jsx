@@ -14,6 +14,9 @@ export default function DispatcherControls({
   onAddIncident,
   onAddVehicle,
   onAddStation,
+
+  responders,
+  onAssignResponder,
   pickedLocation,
   clearPickedLocation,
   isAddingCar,
@@ -26,6 +29,7 @@ export default function DispatcherControls({
   const { showSuccess, showError } = useNotification();
   const [activeTab, setActiveTab] = useState("incidents");
   const [selectedIncidentId, setSelectedIncidentId] = useState(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState(null); // For assigning responder
 
   // Toggle States
 
@@ -319,17 +323,21 @@ export default function DispatcherControls({
                                   <option value="" disabled>
                                     Select Unit...
                                   </option>
-                                  {cars
-                                    .filter((c) => c.status === "AVAILABLE")
-                                    .filter((c) => c.vehicle_type === inc.type)
-                                    .map((c) => (
-                                      <option
-                                        key={c.vehicle_id}
-                                        value={c.vehicle_id}
-                                      >
-                                        {c.vehicle_id}
-                                      </option>
-                                    ))}
+                                  {(cars.filter(c => c.status === "AVAILABLE" && c.vehicle_type === inc.type).length > 0) ? (
+                                    cars
+                                      .filter((c) => c.status === "AVAILABLE")
+                                      .filter((c) => c.vehicle_type === inc.type)
+                                      .map((c) => (
+                                        <option
+                                          key={c.vehicle_id}
+                                          value={c.vehicle_id}
+                                        >
+                                          {c.vehicle_id} ({c.vehicle_type})
+                                        </option>
+                                      ))
+                                  ) : (
+                                    <option disabled>No {inc.type} units available</option>
+                                  )}
                                 </select>
                                 <button
                                   className="btn-cancel"
@@ -498,6 +506,55 @@ export default function DispatcherControls({
                         <span className="card-desc">
                           Station: {car.station_id}
                         </span>
+
+                        {/* Responder Assignment UI */}
+                        <div style={{ marginTop: "10px", width: "100%" }}>
+                          {selectedVehicleId === car.vehicle_id ? (
+                            <div className="unit-selector">
+                              <select
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    onAssignResponder(car.vehicle_id, e.target.value);
+                                    setSelectedVehicleId(null);
+                                  }
+                                }}
+                                defaultValue=""
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <option value="" disabled>Select Responder...</option>
+                                {responders && responders.length > 0 ? (
+                                  responders.map((r) => (
+                                    <option key={r.user_id} value={r.user_id}>
+                                      {r.name} ({r.email})
+                                    </option>
+                                  ))
+                                ) : (
+                                  <option disabled>No responders available</option>
+                                )}
+                              </select>
+                              <button
+                                className="btn-cancel"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedVehicleId(null);
+                                }}
+                              >
+                                X
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              className="btn-dispatch"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedVehicleId(car.vehicle_id);
+                              }}
+                              style={{ width: "100%", marginTop: "5px" }}
+                            >
+                              Assign Responder
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}

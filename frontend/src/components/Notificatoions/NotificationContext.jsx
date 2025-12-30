@@ -51,6 +51,39 @@ export function NotificationProvider({ children }) {
 
 					// Also show a transient snackbar
 					showInfo(data.title);
+				} else if (data.action === "vehicle_assignment_updated") {
+					const newNotif = {
+						id: Date.now(),
+						title: "Vehicle Assignment Update",
+						body: `Responder ${data.user.name} assigned to Vehicle #${data.vehicle.vehicle_id}`,
+						time: new Date().toISOString(),
+						read: false
+					};
+					setNotifications(prev => [newNotif, ...prev]);
+					setUnreadCount(prev => prev + 1);
+					showInfo("Vehicle Assigned");
+				} else if (data.action === "you_are_assigned") {
+					const newNotif = {
+						id: Date.now(),
+						title: "New Assignment",
+						body: `You have been assigned to Vehicle #${data.vehicle.vehicle_id}`,
+						time: new Date().toISOString(),
+						read: false
+					};
+					setNotifications(prev => [newNotif, ...prev]);
+					setUnreadCount(prev => prev + 1);
+					showSuccess("You have been assigned to a vehicle!");
+				} else if (data.action === "incident_resolved") {
+					const newNotif = {
+						id: Date.now(),
+						title: "Incident Resolved",
+						body: `Incident #${data.incident_id} has been resolved.`,
+						time: new Date().toISOString(),
+						read: false
+					};
+					setNotifications(prev => [newNotif, ...prev]);
+					setUnreadCount(prev => prev + 1);
+					showSuccess(`Incident #${data.incident_id} Resolved`);
 				}
 			} catch (err) {
 				console.error("Error parsing notification WS message", err);

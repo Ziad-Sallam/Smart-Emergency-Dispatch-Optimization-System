@@ -581,6 +581,25 @@ def get_all_admin_users():
         raise Exception(f"Failed to fetch admin users: {str(e)}")
 
 
+def get_all_responders():
+    """Get all responder users"""
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT user_id, email, name, role
+                FROM user
+                WHERE role = 'RESPONDER'
+                ORDER BY name
+            """
+            )
+
+            rows = cursor.fetchall()
+            return [zip_user(row, cursor.description) for row in rows]
+    except Exception as e:
+        raise Exception(f"Failed to fetch responders: {str(e)}")
+
+
 def get_average_response_time():
     try:
         with connection.cursor() as cursor:

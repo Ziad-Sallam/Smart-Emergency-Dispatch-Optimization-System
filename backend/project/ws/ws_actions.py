@@ -315,6 +315,23 @@ class WSActions:
         except Exception as e:
             return {"action": "error", "message": str(e)}
 
+    async def action_list_responders(self, data):
+        try:
+            if not self.user or self.user['role'] not in ['ADMIN', 'DISPATCHER']:
+                return {"action": "error", "message": "Unauthorized"}
+            
+            get_responders = sync_to_async(repo.get_all_responders)
+            responders = await get_responders()
+            responders = convert_for_json(responders)
+            
+            return {
+                "action": "list_responders_response",
+                "responders": responders,
+                "count": len(responders)
+            }
+        except Exception as e:
+            return {"action": "error", "message": str(e)}
+
     async def action_create_admin(self, data):
         try:
             if not self.user or self.user['role'] != 'ADMIN':
@@ -453,6 +470,13 @@ class WSActions:
                 title=f"Incident #{data['incident_id']} Resolved",
                 body=f"Incident has been marked as resolved."
             )
+
+            # Broadcast Notification Popup
+            await self._broadcast("group_ADMIN", {
+                "title": f"Incident #{data['incident_id']} Resolved",
+                "body": "Incident has been marked as resolved.",
+                "created_at": datetime.now().isoformat()
+            }, "new_notification")
 
             # Create User Notification for responders
             # We notify all responders involved in this incident

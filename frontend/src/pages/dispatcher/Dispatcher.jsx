@@ -6,8 +6,9 @@ import { useNotification } from "../../components/Notificatoions/NotificationCon
 // import "./Dispatcher.css"; 
 
 export default function Dispatcher() {
-  const {showError,showSuccess,showWarning} = useNotification();
+  const { showError, showSuccess, showWarning } = useNotification();
   // 1. DATA STATE 
+  const [responders, setResponders] = useState([]);
   const [stations, setStations] = useState([]);
 
   const [incidents, setIncidents] = useState([]);
@@ -44,6 +45,19 @@ export default function Dispatcher() {
     }
   };
 
+  const assignResponder = (vehicleId, responderId) => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({
+        action: "action_assign_responder_to_vehicle",
+        vehicle_id: parseInt(vehicleId),
+        responder_id: parseInt(responderId)
+      }));
+    } else {
+      console.error("WebSocket not connected");
+      showError("WebSocket not connected. Please refresh.");
+    }
+  };
+
 
   // WebSocket Reference
   const ws = React.useRef(null);
@@ -62,6 +76,7 @@ export default function Dispatcher() {
       ws.current.send(JSON.stringify({ action: "action_list_incidents" }));
       ws.current.send(JSON.stringify({ action: "action_list_vehicles" }));
       ws.current.send(JSON.stringify({ action: "action_list_stations" }));
+      ws.current.send(JSON.stringify({ action: "action_list_responders" }));
     };
 
     ws.current.onmessage = (event) => {
@@ -77,6 +92,9 @@ export default function Dispatcher() {
           break;
         case "list_stations_response":
           if (data.stations) setStations(data.stations);
+          break;
+        case "list_responders_response":
+          if (data.responders) setResponders(data.responders);
           break;
         case "report_incident_response":
           console.log("Incident reported:", data);
@@ -164,7 +182,7 @@ export default function Dispatcher() {
         case "vehicle_location_updated":
           setCars((prevCars) =>
             prevCars.map((car) =>
-              car.id === data.vehicle_id ? { ...car, lat:data.lat, lng:data.lng } : car
+              car.id === data.vehicle_id ? { ...car, lat: data.lat, lng: data.lng } : car
             )
           );
           break;
@@ -205,6 +223,8 @@ export default function Dispatcher() {
           setIsAddingCar={setIsAddingCar}
           setIsAddingIncident={setIsAddingIncident}
           setIsAddingStation={setIsAddingStation}
+          responders={responders}
+          onAssignResponder={assignResponder}
         />
       </div>
 
