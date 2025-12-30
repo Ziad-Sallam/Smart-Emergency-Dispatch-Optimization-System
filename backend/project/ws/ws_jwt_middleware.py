@@ -30,7 +30,8 @@ class JWTAuthMiddleware(BaseMiddleware):
             if user:
                 scope["user"] = user
 
-        except Exception:
+        except Exception as e:
+            print(f"WS JWT Auth Failed: {e}")
             scope["user"] = None
 
         return await super().__call__(scope, receive, send)

@@ -1,6 +1,7 @@
-import React, { act, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./DispatcherControls.css";
 import { useNotification } from "../Notificatoions/NotificationContext";
+import NotificationBell from "../Notificatoions/NotificationBell";
 
 
 export default function DispatcherControls({
@@ -171,7 +172,10 @@ export default function DispatcherControls({
   return (
     <div className="dispatcher-controls">
       <header className="dc-header">
-        <h2>Dispatcher Command</h2>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+          <h2>Dispatcher Command</h2>
+          <NotificationBell />
+        </div>
         <div className="dc-stats">
           <span>
             Active: {allIncidents.filter((i) => i.status !== "RESOLVED").length}

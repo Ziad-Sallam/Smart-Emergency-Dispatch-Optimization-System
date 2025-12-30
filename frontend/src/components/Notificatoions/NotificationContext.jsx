@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import Notification from './Notification.jsx';
 
 const NotificationContext = createContext();
@@ -19,6 +19,52 @@ export function NotificationProvider({ children }) {
 		duration: 3000,
 		timestamp: null
 	});
+
+	// Persistent Notifications State
+	const [notifications, setNotifications] = useState([]);
+	const [unreadCount, setUnreadCount] = useState(0);
+
+	// WebSocket for Notifications
+	useEffect(() => {
+		const token = localStorage.getItem("access_token");
+		// Use a specific path or query param if needed, or share the same endpoint
+		const wsUrl = `ws://127.0.0.1:8000/ws/chat/?token=${token}`;
+		const ws = new WebSocket(wsUrl);
+
+		ws.onopen = () => {
+			console.log("Notification WS Connected");
+		};
+
+		ws.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				if (data.action === "new_notification") {
+					const newNotif = {
+						id: Date.now(),
+						title: data.title || '',
+						body: data.body || '',
+						time: data.created_at || data.time || new Date().toISOString(),
+						read: false
+					};
+					setNotifications(prev => [newNotif, ...prev]);
+					setUnreadCount(prev => prev + 1);
+
+					// Also show a transient snackbar
+					showInfo(data.title);
+				}
+			} catch (err) {
+				console.error("Error parsing notification WS message", err);
+			}
+		};
+
+		ws.onclose = () => {
+			console.log("Notification WS Disconnected");
+		};
+
+		return () => {
+			ws.close();
+		};
+	}, []);
 
 	function showNotification(message, severity = 'success', duration = 3000) {
 		setNotification({
@@ -50,6 +96,11 @@ export function NotificationProvider({ children }) {
 		setNotification(prev => ({ ...prev, open: false }));
 	}
 
+	function markAsRead() {
+		setUnreadCount(0);
+		setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+	}
+
 	return (
 		<NotificationContext.Provider
 			value={{
@@ -58,7 +109,10 @@ export function NotificationProvider({ children }) {
 				showError,
 				showWarning,
 				showInfo,
-				hideNotification
+				hideNotification,
+				notifications,
+				unreadCount,
+				markAsRead
 			}}
 		>
 			{children}

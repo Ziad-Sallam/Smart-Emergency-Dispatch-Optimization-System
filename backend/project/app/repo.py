@@ -1,5 +1,7 @@
 from django.db import connection
 from datetime import datetime
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 def update_user_password(user_id, new_hashed_password):
@@ -90,7 +92,25 @@ def create_incident(
             )
 
             row = cursor.fetchone()
-            return zip_incident(row, cursor.description)
+            incident = zip_incident(row, cursor.description)
+
+            # Broadcast to admins about new incident
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "group_ADMIN",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "new_notification",
+                        "title": f"New Incident Reported: #{incident['incident_id']}",
+                        "body": f"Incident #{incident['incident_id']} ({incident['type']}, {incident['severity_level']}) reported.",
+                        "incident_id": incident['incident_id'],
+                        "created_at": incident['time_reported'].isoformat() if hasattr(incident['time_reported'], 'isoformat') else str(incident['time_reported'])
+                    }
+                }
+            )
+
+            return incident
 
     except Exception as e:
         raise Exception(f"Incident created but not assigned: {str(e)}")
@@ -299,7 +319,25 @@ def create_vehicle(station_id, capacity, lat, lng):
             )
 
             vehicle_id = cursor.lastrowid
-            return get_vehicle_by_id(vehicle_id)
+            vehicle = get_vehicle_by_id(vehicle_id)
+
+            # Broadcast to all users about new vehicle
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "all_users",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "new_notification",
+                        "title": f"New Vehicle Added: #{vehicle_id}",
+                        "body": f"Vehicle with capacity {capacity} added to station {station_id}.",
+                        "vehicle_id": vehicle_id,
+                        "created_at": datetime.now().isoformat()
+                    }
+                }
+            )
+
+            return vehicle
     except Exception as e:
         raise Exception(f"Failed to create vehicle: {str(e)}")
 
@@ -351,6 +389,22 @@ def reassign_dispatch(incident_id, vehicle_id, dispatcher_id):
             # Fetch result
             cursor.execute("SELECT @_reassign_incident_vehicle_3")
             result = cursor.fetchone()
+
+            # Broadcast to admins about dispatch assignment
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "group_ADMIN",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "new_notification",
+                        "title": f"Responder Assigned: Incident #{incident_id}",
+                        "body": f"Vehicle #{vehicle_id} assigned to incident #{incident_id} by dispatcher #{dispatcher_id}.",
+                        "incident_id": incident_id,
+                        "created_at": datetime.now().isoformat()
+                    }
+                }
+            )
 
             return get_incident_by_id(incident_id)
     except Exception as e:
@@ -464,7 +518,25 @@ def create_station(station_type, zone, lat, lng):
             )
 
             row = cursor.fetchone()
-            return zip_station(row, cursor.description)
+            station = zip_station(row, cursor.description)
+
+            # Broadcast to all users about new station
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "all_users",
+                {
+                    "type": "broadcast_message",
+                    "message": {
+                        "action": "new_notification",
+                        "title": f"New Station Created: #{station['station_id']}",
+                        "body": f"Station {station['type']} in zone {station['zone']} was added.",
+                        "station_id": station['station_id'],
+                        "created_at": datetime.now().isoformat()
+                    }
+                }
+            )
+
+            return station
     except Exception as e:
         raise Exception(f"Failed to create station: {str(e)}")
 
@@ -904,15 +976,6 @@ def create_admin_notification(title, body):
             """, [title, body])
             
             notif_id = cursor.lastrowid
-            
-            # 2. Link to all admins/dispatchers (OPTIONAL: if we want to track 'read' status per user)
-            # For now, we just create the notification record.
-            # If we need to populate admin_notification_status, we would do it here.
-            # Let's populate it for all admins/dispatchers so they can 'seen' it.
-            cursor.execute("""
-                INSERT INTO admin_notification_status (admin_id, admin_notification_id)
-                SELECT user_id, %s FROM user WHERE role IN ('ADMIN', 'DISPATCHER')
-            """, [notif_id])
             
             return {
                 "admin_notification_id": notif_id,
