@@ -20,3 +20,17 @@ def remove_vehicle_user(vehicle_id, user_id):
 
 def get_users_for_vehicle(vehicle_id):
     return [int(u) for u in r.smembers(f"vehicle:{vehicle_id}:users")]
+
+def set_vehicle_route(vehicle_id, route):
+    r.set(f"vehicle:route:{vehicle_id}", json.dumps(route))
+    r.set(f"vehicle:route_index:{vehicle_id}", 0)
+
+def get_vehicle_route(vehicle_id):
+    data = r.get(f"vehicle:route:{vehicle_id}")
+    return json.loads(data) if data else None
+
+def set_route_index(vehicle_id, idx):
+    r.set(f"vehicle:route_index:{vehicle_id}", idx)
+
+def get_route_index(vehicle_id):
+    return int(r.get(f"vehicle:route_index:{vehicle_id}") or 0)

@@ -4,6 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import asyncio
 from .route_streamer import stream_vehicle_route
 from .vehicle_state import add_vehicle_user
+from .vehicle_state import get_vehicle_route, get_last_location
 
 class FleetConsumer(AsyncWebsocketConsumer):
 
@@ -61,10 +62,25 @@ class FleetConsumer(AsyncWebsocketConsumer):
         # Track user in Redis
         add_vehicle_user(vehicle_id, self.user_id)
 
+        # --- Send current route if exists ---
+        route = get_vehicle_route(vehicle_id)
+        if route:
+            last_location = get_last_location(vehicle_id)
+            start = f"{last_location['lng']},{last_location['lat']}" if last_location else None
+            end = route[-1] if isinstance(route, list) else None  # last point as end
+            await self.send_json({
+                "action": "vehicle_route",
+                "vehicle_id": vehicle_id,
+                "route": route,
+                "start": start,
+                "end": end,
+            })
+
         await self.send_json({
             "action": "vehicle_subscribed",
             "vehicle_id": vehicle_id
         })
+
 
     async def unsubscribe_vehicle(self, data):
         vehicle_id = data.get("vehicle_id")
@@ -88,6 +104,19 @@ class FleetConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(payload, cls=DjangoJSONEncoder)
         )
+
+    async def vehicle_route(self, event):
+        """
+        Receives full route when vehicle is dispatched
+        """
+        await self.send_json({
+            "action": "vehicle_route",
+            "vehicle_id": event["vehicle_id"],
+            "route": event["route"],
+            "start": event["start"],
+            "end": event["end"],
+        })
+
 
 
     async def start_vehicle_route(self, data):
