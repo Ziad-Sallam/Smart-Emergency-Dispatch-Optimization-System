@@ -235,14 +235,34 @@ const ResponderPage = () => {
             try {
                 const data = JSON.parse(event.data);
                 console.log("Vehicle WS Message", data);
-                if (data.action === "vehicle_location_update") {
-                    if (data.vehicle_id === vehicle.vehicle_id) {
-                        setVehicle(prev => ({
-                            ...prev,
-                            lng: data.lng,
+                switch(data.action){
+                    case "vehicle_route":
+                        if (data.vehicle_id === vehicle.vehicle_id) {
+                            const geoJsonRoute = {
+                                type: "FeatureCollection",
+                                features: [{
+                                    type: "Feature",
+                                    properties: {},
+                                    geometry: {
+                                        type: "LineString",
+                                        coordinates: data.route
+                                    }
+                                }]
+                            };
+                            setRoute(geoJsonRoute);
+                        }
+                        break;
+                    case "vehicle_location_update":
+                        if (data.vehicle_id === vehicle.vehicle_id) {
+                            setVehicle(prev => ({
+                                ...prev,
+                                lng: data.lng,
                             lat: data.lat,
                         }));
-                    }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             } catch (err) {
                 console.error("WS Parse Error", err);

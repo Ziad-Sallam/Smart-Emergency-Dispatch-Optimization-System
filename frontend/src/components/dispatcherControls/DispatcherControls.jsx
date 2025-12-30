@@ -6,6 +6,7 @@ import NotificationBell from "../Notificatoions/NotificationBell";
 
 export default function DispatcherControls({
   ws,
+  vehicleWs,
   stations,
   cars,
   allIncidents,
@@ -172,9 +173,9 @@ export default function DispatcherControls({
   };
 
   const trackCar = (carId) => {
-    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({
-        action: "action_track_vehicle",
+    if (vehicleWs.current && vehicleWs.current.readyState === WebSocket.OPEN) {
+      vehicleWs.current.send(JSON.stringify({
+        action: "subscribe_vehicle",
         vehicle_id: carId
       }));
     } else {
@@ -182,6 +183,7 @@ export default function DispatcherControls({
       showError("WebSocket not connected.");
     }
   };
+
 
   // --- RENDER FUNCTIONS ---
 
@@ -483,7 +485,7 @@ export default function DispatcherControls({
                             >
                               DELETE
                             </button>
-                            <button
+                            {/* <button
                               className="track-button"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -491,7 +493,7 @@ export default function DispatcherControls({
                               }}
                             >
                               Track
-                            </button>
+                            </button> */}
                           </div>
                           <h4>{car.vehicle_type}</h4>
                           <div

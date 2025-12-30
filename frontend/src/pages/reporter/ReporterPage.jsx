@@ -175,7 +175,8 @@ const ReporterPage = () => {
                 <EmergencyMap
                     stations={[]} // Hiding stations for reporter
                     cars={[]}     // Hiding cars for reporter
-                    allIncidents={[]} // Hiding other incidents for reporter
+                    allIncidents={[]}
+                    routes={[]} // Hiding other incidents for reporter
                     focusedLocation={null}
                     onMapClick={handleMapClick}
                     pickedLocation={pickedLocation}

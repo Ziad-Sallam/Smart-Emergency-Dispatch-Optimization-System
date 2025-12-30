@@ -22,6 +22,8 @@ export default function Dispatcher() {
   const [isAddingCar, setIsAddingCar] = useState(false);
   const [isAddingStation, setIsAddingStation] = useState(false);
 
+  const [routes, setRoutes] = useState([]);
+
 
 
   const handleLocate = (lat, lng) => {
@@ -176,9 +178,23 @@ export default function Dispatcher() {
 
     VehicleWS.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("WS Message:", data);
+      console.log("vehicle WS Message:", data);
 
       switch (data.action) {
+        case "vehicle_route":
+          const geoJsonRoute = {
+            type: "FeatureCollection",
+            features: [{
+              type: "Feature",
+              properties: {},
+              geometry: {
+                type: "LineString",
+                coordinates: data.route
+              }
+            }]
+          };
+          setRoutes((prevRoutes) => [...prevRoutes, geoJsonRoute]);
+          break;
         case "vehicle_location_updated":
           setCars((prevCars) =>
             prevCars.map((car) =>
@@ -210,6 +226,7 @@ export default function Dispatcher() {
       <div style={{ width: "400px", zIndex: 20, boxShadow: "2px 0 10px rgba(0,0,0,0.1)" }}>
         <DispatcherControls
           ws={ws}
+          vehicleWs={VehicleWS}
           stations={stations}
           cars={cars}
           allIncidents={incidents}
@@ -234,7 +251,7 @@ export default function Dispatcher() {
           cars={cars}
           allIncidents={incidents}
           focusedLocation={focusedLocation}
-          routes={[]}
+          routes={routes}
           onMapClick={handleMapClick}
           pickedLocation={pickedLocation}
           isAddingCar={isAddingCar}
