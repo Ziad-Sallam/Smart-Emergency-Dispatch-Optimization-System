@@ -33,6 +33,13 @@ export function NotificationProvider({ children }) {
 
 		ws.onopen = () => {
 			console.log("Notification WS Connected");
+			// Fetch history based on role
+			const role = localStorage.getItem("user_role");
+			if (role === 'ADMIN' || role === 'DISPATCHER') {
+				ws.send(JSON.stringify({ action: "action_list_admin_notifications" }));
+			} else {
+				ws.send(JSON.stringify({ action: "action_list_user_notifications" }));
+			}
 		};
 
 		ws.onmessage = (event) => {
@@ -84,6 +91,40 @@ export function NotificationProvider({ children }) {
 					setNotifications(prev => [newNotif, ...prev]);
 					setUnreadCount(prev => prev + 1);
 					showSuccess(`Incident #${data.incident_id} Resolved`);
+				} else if (data.action === "list_admin_notifications_response") {
+					if (data.notifications) {
+						const history = data.notifications.map(n => ({
+							id: n.admin_notification_id,
+							title: n.title,
+							body: n.body,
+							time: n.created_at,
+							read: true // Mark history as read to avoid badge clutter
+						}));
+						setNotifications(prev => {
+							// Merge and avoid duplicates by ID
+							const currentIds = new Set(prev.map(i => i.id));
+							const uniqueHistory = history.filter(h => !currentIds.has(h.id));
+							return [...uniqueHistory, ...prev];
+						});
+					}
+				} else if (data.action === "list_user_notifications_response") {
+					if (data.notifications) {
+						const history = data.notifications.map(n => ({
+							id: n.user_notification_id,
+							title: n.title,
+							body: `Incident #${n.incident_id}`,
+							time: n.created_at,
+							read: n.status === 'READ'
+						}));
+						setNotifications(prev => {
+							const currentIds = new Set(prev.map(i => i.id));
+							const uniqueHistory = history.filter(h => !currentIds.has(h.id));
+							return [...uniqueHistory, ...prev];
+						});
+						// Calculate unread
+						const unread = history.filter(n => !n.read).length;
+						setUnreadCount(prev => prev + unread);
+					}
 				}
 			} catch (err) {
 				console.error("Error parsing notification WS message", err);
